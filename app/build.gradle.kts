@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.psaimusic.mediaplayer"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.psaimusic.mediaplayer"

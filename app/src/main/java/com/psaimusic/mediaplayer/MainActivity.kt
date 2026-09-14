@@ -24,6 +24,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -41,7 +42,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Forward10
 import androidx.compose.material.icons.filled.Link
@@ -51,15 +51,12 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Replay10
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -196,7 +193,6 @@ private fun PSMediaPlayerTheme(settings: ThemeSettings, content: @Composable () 
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlayerApp(
     player: ExoPlayer,
@@ -216,7 +212,7 @@ private fun PlayerApp(
     var volume by remember { mutableFloatStateOf(player.volume) }
 
     fun loadUri(uri: Uri, sourceLabel: String? = null) {
-        val mime = context.contentResolver.getType(uri).orEmpty()
+        val mime = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
         mediaKind = when {
             mime.startsWith("video/") -> MediaKind.VIDEO
             mime.startsWith("audio/") -> MediaKind.AUDIO
@@ -374,11 +370,12 @@ private fun PlayerApp(
         StreamDialog(
             onDismiss = { showStreamDialog = false },
             onOpen = { value ->
-                runCatching { Uri.parse(value.trim()) }
-                    .onSuccess { uri ->
-                        loadUri(uri, value.trim())
-                        showStreamDialog = false
-                    }
+                val trimmed = value.trim()
+                val parsed = runCatching { Uri.parse(trimmed) }.getOrNull()
+                if (parsed != null && parsed.scheme in setOf("http", "https", "rtsp")) {
+                    loadUri(parsed, trimmed)
+                    showStreamDialog = false
+                }
             }
         )
     }
@@ -485,10 +482,7 @@ private fun PlayerStage(
             .aspectRatio(1.12f)
             .clip(shape)
             .background(Color.Black.copy(alpha = .42f))
-            .border(
-                BorderStroke(1.dp, Color.White.copy(alpha = .10f)),
-                shape
-            ),
+            .border(BorderStroke(1.dp, Color.White.copy(alpha = .10f)), shape),
         contentAlignment = Alignment.Center
     ) {
         when (mediaKind) {
@@ -572,9 +566,7 @@ private fun AudioHero(settings: ThemeSettings, active: Boolean) {
     Canvas(Modifier.size(240.dp)) {
         val r = size.minDimension / 2f
         drawCircle(
-            brush = Brush.radialGradient(
-                listOf(primary.copy(alpha = .22f), Color.Transparent)
-            ),
+            brush = Brush.radialGradient(listOf(primary.copy(alpha = .22f), Color.Transparent)),
             radius = r * 1.05f
         )
         drawCircle(
@@ -618,10 +610,7 @@ private fun TransportCard(
             enabled = duration > 0,
             modifier = Modifier.fillMaxWidth()
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(formatTime(position), color = Color.White.copy(alpha = .48f), fontSize = 11.sp)
             Text(formatTime(duration), color = Color.White.copy(alpha = .48f), fontSize = 11.sp)
         }
@@ -670,10 +659,7 @@ private fun QuickActions(
     onStream: () -> Unit,
     onDesign: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         ActionTile(
             modifier = Modifier.weight(1f),
             icon = { Icon(Icons.Filled.FolderOpen, null) },
@@ -708,9 +694,7 @@ private fun ActionTile(
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             icon()
@@ -721,7 +705,7 @@ private fun ActionTile(
 }
 
 @Composable
-private fun GlassCard(content: @Composable Column.() -> Unit) {
+private fun GlassCard(content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -828,7 +812,7 @@ private fun DesignStudioDialog(
                     valueRange = 0.1f..1f
                 )
 
-                Text("RGB Flow ${(23000 - draft.flowSpeed) / 1000f}x", fontSize = 12.sp)
+                Text("RGB Flow", fontSize = 12.sp)
                 Slider(
                     value = draft.flowSpeed.toFloat(),
                     onValueChange = { draft = draft.copy(flowSpeed = it.toInt()) },

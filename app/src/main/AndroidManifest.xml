@@ -11,7 +11,7 @@
         android:label="PS Media Player"
         android:supportsRtl="true"
         android:theme="@style/Theme.PSMediaPlayer"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".MainActivity"
@@ -28,6 +28,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+                <data android:scheme="rtsp" />
                 <data android:scheme="content" />
                 <data android:scheme="file" />
             </intent-filter>

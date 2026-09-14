@@ -11,8 +11,8 @@ android {
         applicationId = "com.psaimusic.mediaplayer"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -63,12 +63,7 @@ dependencies {
 
     val media3Version = "1.11.0"
     implementation("androidx.media3:media3-exoplayer:$media3Version")
-    implementation("androidx.media3:media3-exoplayer-dash:$media3Version")
-    implementation("androidx.media3:media3-exoplayer-hls:$media3Version")
-    implementation("androidx.media3:media3-exoplayer-rtsp:$media3Version")
-    implementation("androidx.media3:media3-exoplayer-smoothstreaming:$media3Version")
     implementation("androidx.media3:media3-ui:$media3Version")
-    implementation("androidx.media3:media3-session:$media3Version")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

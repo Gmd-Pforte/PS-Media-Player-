@@ -3,6 +3,7 @@ package com.psaimusic.mediaplayer
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -41,33 +42,38 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Forward10
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Replay10
-import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -95,10 +101,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.delay
+import org.json.JSONArray
+import org.json.JSONObject
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -147,6 +156,16 @@ data class ThemeSettings(
     val motionEnabled: Boolean = true
 )
 
+private enum class MediaKind { NONE, AUDIO, VIDEO, MEDIA }
+
+private data class LocalTrack(
+    val uri: Uri,
+    val name: String,
+    val mime: String,
+    val kind: MediaKind,
+    val durationHintMs: Long = 0L
+)
+
 private object ThemeStore {
     private const val PREFS = "ps_player_design"
 
@@ -175,7 +194,54 @@ private object ThemeStore {
     }
 }
 
-private enum class MediaKind { NONE, AUDIO, VIDEO, STREAM }
+private object PlaylistStore {
+    private const val PREFS = "ps_player_playlist"
+    private const val KEY_ITEMS = "items"
+
+    fun load(context: Context): List<LocalTrack> {
+        val raw = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_ITEMS, null) ?: return emptyList()
+
+        return runCatching {
+            val array = JSONArray(raw)
+            val result = mutableListOf<LocalTrack>()
+            for (index in 0 until array.length()) {
+                val item = array.optJSONObject(index) ?: continue
+                val uriText = item.optString("uri")
+                if (uriText.isBlank()) continue
+                val kind = runCatching {
+                    MediaKind.valueOf(item.optString("kind", MediaKind.MEDIA.name))
+                }.getOrDefault(MediaKind.MEDIA)
+                result += LocalTrack(
+                    uri = Uri.parse(uriText),
+                    name = item.optString("name", "Medium"),
+                    mime = item.optString("mime", ""),
+                    kind = kind,
+                    durationHintMs = item.optLong("duration", 0L)
+                )
+            }
+            result
+        }.getOrDefault(emptyList())
+    }
+
+    fun save(context: Context, tracks: List<LocalTrack>) {
+        val array = JSONArray()
+        tracks.forEach { track ->
+            array.put(
+                JSONObject()
+                    .put("uri", track.uri.toString())
+                    .put("name", track.name)
+                    .put("mime", track.mime)
+                    .put("kind", track.kind.name)
+                    .put("duration", track.durationHintMs)
+            )
+        }
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_ITEMS, array.toString())
+            .apply()
+    }
+}
 
 @Composable
 private fun PSMediaPlayerTheme(settings: ThemeSettings, content: @Composable () -> Unit) {
@@ -202,71 +268,142 @@ private fun PlayerApp(
 ) {
     val context = LocalContext.current
     var showDesignStudio by remember { mutableStateOf(false) }
-    var showStreamDialog by remember { mutableStateOf(false) }
-    var title by remember { mutableStateOf("Noch nichts geladen") }
-    var subtitle by remember { mutableStateOf("Öffne Musik, Video oder einen Stream") }
-    var mediaKind by remember { mutableStateOf(MediaKind.NONE) }
+    var playlist by remember { mutableStateOf(PlaylistStore.load(context)) }
+    var currentIndex by remember { mutableStateOf(if (playlist.isEmpty()) -1 else 0) }
     var isPlaying by remember { mutableStateOf(false) }
     var position by remember { mutableLongStateOf(0L) }
     var duration by remember { mutableLongStateOf(0L) }
     var volume by remember { mutableFloatStateOf(player.volume) }
+    var shuffleEnabled by remember { mutableStateOf(player.shuffleModeEnabled) }
+    var repeatMode by remember { mutableStateOf(player.repeatMode) }
 
-    fun loadUri(uri: Uri, sourceLabel: String? = null) {
-        val mime = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
-        mediaKind = when {
-            mime.startsWith("video/") -> MediaKind.VIDEO
-            mime.startsWith("audio/") -> MediaKind.AUDIO
-            uri.scheme == "http" || uri.scheme == "https" || uri.scheme == "rtsp" -> MediaKind.STREAM
-            else -> MediaKind.STREAM
+    fun persist(items: List<LocalTrack>) {
+        playlist = items
+        PlaylistStore.save(context, items)
+    }
+
+    fun appendUris(uris: List<Uri>, playFirstAdded: Boolean = false) {
+        if (uris.isEmpty()) return
+        uris.forEach { takeReadPermission(context, it) }
+
+        val seen = playlist.map { it.uri.toString() }.toMutableSet()
+        val newTracks = uris
+            .distinctBy { it.toString() }
+            .filter { seen.add(it.toString()) }
+            .map { buildTrack(context, it) }
+
+        if (newTracks.isEmpty()) return
+
+        val oldSize = playlist.size
+        val wasEmpty = playlist.isEmpty()
+        val updated = playlist + newTracks
+        persist(updated)
+
+        if (wasEmpty || player.mediaItemCount == 0) {
+            player.setMediaItems(updated.map { it.toMediaItem() })
+            player.prepare()
+        } else {
+            player.addMediaItems(newTracks.map { it.toMediaItem() })
         }
-        title = sourceLabel ?: displayName(context, uri) ?: uri.lastPathSegment ?: "Medium"
-        subtitle = when (mediaKind) {
-            MediaKind.AUDIO -> mime.ifBlank { "Audio" }
-            MediaKind.VIDEO -> mime.ifBlank { "Video" }
-            MediaKind.STREAM -> "Netzwerk / Stream"
-            MediaKind.NONE -> ""
+
+        if (playFirstAdded || wasEmpty) {
+            val target = if (wasEmpty) 0 else oldSize
+            player.seekTo(target, 0L)
+            player.play()
         }
-        player.setMediaItem(MediaItem.fromUri(uri))
-        player.prepare()
-        player.playWhenReady = true
+    }
+
+    fun removeTrack(index: Int) {
+        if (index !in playlist.indices) return
+        val updated = playlist.toMutableList().apply { removeAt(index) }
+        if (index < player.mediaItemCount) {
+            player.removeMediaItem(index)
+        }
+        persist(updated)
+        if (updated.isEmpty()) {
+            player.stop()
+            player.clearMediaItems()
+            currentIndex = -1
+            position = 0L
+            duration = 0L
+        }
+    }
+
+    fun clearPlaylist() {
+        player.stop()
+        player.clearMediaItems()
+        persist(emptyList())
+        currentIndex = -1
+        position = 0L
+        duration = 0L
     }
 
     val filePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            try {
-                context.contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            } catch (_: Exception) {
-            }
-            loadUri(uri)
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        appendUris(uris)
+    }
+
+    LaunchedEffect(Unit) {
+        if (playlist.isNotEmpty() && player.mediaItemCount == 0) {
+            player.setMediaItems(playlist.map { it.toMediaItem() })
+            player.prepare()
+            player.playWhenReady = false
         }
     }
 
     LaunchedEffect(initialUri) {
-        if (initialUri != null) loadUri(initialUri)
+        if (initialUri != null) {
+            appendUris(listOf(initialUri), playFirstAdded = true)
+            val index = playlist.indexOfFirst { it.uri == initialUri }
+            if (index >= 0) {
+                player.seekTo(index, 0L)
+                player.play()
+            }
+        }
     }
 
     LaunchedEffect(player) {
         while (true) {
             isPlaying = player.isPlaying
+            currentIndex = if (player.mediaItemCount > 0) player.currentMediaItemIndex else -1
             position = player.currentPosition.coerceAtLeast(0L)
-            duration = if (player.duration == C.TIME_UNSET || player.duration < 0) 0L else player.duration
+            val playerDuration = if (player.duration == C.TIME_UNSET || player.duration < 0) 0L else player.duration
+            duration = if (playerDuration > 0) {
+                playerDuration
+            } else {
+                playlist.getOrNull(currentIndex)?.durationHintMs ?: 0L
+            }
             volume = player.volume
-            delay(350)
+            shuffleEnabled = player.shuffleModeEnabled
+            repeatMode = player.repeatMode
+            delay(300)
         }
     }
+
+    val currentTrack = playlist.getOrNull(currentIndex)
+    val mediaKind = currentTrack?.kind ?: MediaKind.NONE
+    val title = currentTrack?.name ?: "Noch keine Playlist"
+    val subtitle = if (currentTrack == null) {
+        "Wähle mehrere Audio- oder Videodateien aus"
+    } else {
+        "Track ${currentIndex + 1} von ${playlist.size} • ${kindLabel(currentTrack.kind)}"
+    }
+
+    val pickerTypes = arrayOf(
+        "audio/*",
+        "video/*",
+        "application/ogg",
+        "application/x-ogg",
+        "application/octet-stream"
+    )
 
     AnimatedRgbBackground(themeSettings) {
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
                 HeaderBar(
-                    onOpenFile = { filePicker.launch(arrayOf("audio/*", "video/*", "application/ogg", "application/octet-stream")) },
-                    onOpenStream = { showStreamDialog = true },
+                    onOpenFiles = { filePicker.launch(pickerTypes) },
                     onDesign = { showDesignStudio = true }
                 )
             }
@@ -322,7 +459,11 @@ private fun PlayerApp(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Filled.VolumeUp, contentDescription = null, tint = Color.White.copy(alpha = .72f))
+                        Icon(
+                            Icons.AutoMirrored.Filled.VolumeUp,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = .72f)
+                        )
                         Spacer(Modifier.width(12.dp))
                         Slider(
                             value = volume,
@@ -338,14 +479,45 @@ private fun PlayerApp(
                 Spacer(Modifier.height(14.dp))
 
                 QuickActions(
-                    onOpenFile = { filePicker.launch(arrayOf("audio/*", "video/*", "application/ogg", "application/octet-stream")) },
-                    onStream = { showStreamDialog = true },
+                    onAdd = { filePicker.launch(pickerTypes) },
+                    onClear = { clearPlaylist() },
                     onDesign = { showDesignStudio = true }
+                )
+
+                Spacer(Modifier.height(14.dp))
+
+                PlaylistPanel(
+                    tracks = playlist,
+                    currentIndex = currentIndex,
+                    isPlaying = isPlaying,
+                    primary = Color(themeSettings.primary),
+                    shuffleEnabled = shuffleEnabled,
+                    repeatMode = repeatMode,
+                    onTrackClick = { index ->
+                        if (index in playlist.indices) {
+                            player.seekTo(index, 0L)
+                            player.play()
+                        }
+                    },
+                    onRemoveTrack = { removeTrack(it) },
+                    onToggleShuffle = {
+                        player.shuffleModeEnabled = !player.shuffleModeEnabled
+                        shuffleEnabled = player.shuffleModeEnabled
+                    },
+                    onCycleRepeat = {
+                        val next = when (player.repeatMode) {
+                            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                            else -> Player.REPEAT_MODE_OFF
+                        }
+                        player.repeatMode = next
+                        repeatMode = next
+                    }
                 )
 
                 Spacer(Modifier.height(28.dp))
                 Text(
-                    "PS MEDIA PLAYER • CORE 0.1",
+                    "PS MEDIA PLAYER • LOCAL CORE 0.2",
                     color = Color.White.copy(alpha = .28f),
                     letterSpacing = 2.sp,
                     fontSize = 10.sp
@@ -362,20 +534,6 @@ private fun PlayerApp(
             onApply = {
                 onThemeChanged(it)
                 showDesignStudio = false
-            }
-        )
-    }
-
-    if (showStreamDialog) {
-        StreamDialog(
-            onDismiss = { showStreamDialog = false },
-            onOpen = { value ->
-                val trimmed = value.trim()
-                val parsed = runCatching { Uri.parse(trimmed) }.getOrNull()
-                if (parsed != null && parsed.scheme in setOf("http", "https", "rtsp")) {
-                    loadUri(parsed, trimmed)
-                    showStreamDialog = false
-                }
             }
         )
     }
@@ -442,8 +600,7 @@ private fun AnimatedRgbBackground(settings: ThemeSettings, content: @Composable 
 
 @Composable
 private fun HeaderBar(
-    onOpenFile: () -> Unit,
-    onOpenStream: () -> Unit,
+    onOpenFiles: () -> Unit,
     onDesign: () -> Unit
 ) {
     Row(
@@ -457,11 +614,8 @@ private fun HeaderBar(
             Text("PS", fontSize = 11.sp, letterSpacing = 3.sp, color = MaterialTheme.colorScheme.primary)
             Text("MEDIA PLAYER", fontSize = 18.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
         }
-        IconButton(onClick = onOpenFile) {
-            Icon(Icons.Filled.FolderOpen, "Datei öffnen")
-        }
-        IconButton(onClick = onOpenStream) {
-            Icon(Icons.Filled.Link, "Stream öffnen")
+        IconButton(onClick = onOpenFiles) {
+            Icon(Icons.Filled.FolderOpen, "Medien auswählen")
         }
         IconButton(onClick = onDesign) {
             Icon(Icons.Filled.Palette, "Design Studio", tint = MaterialTheme.colorScheme.primary)
@@ -486,7 +640,7 @@ private fun PlayerStage(
         contentAlignment = Alignment.Center
     ) {
         when (mediaKind) {
-            MediaKind.VIDEO, MediaKind.STREAM -> {
+            MediaKind.VIDEO -> {
                 AndroidView(
                     factory = { context ->
                         PlayerView(context).apply {
@@ -499,7 +653,7 @@ private fun PlayerStage(
                     modifier = Modifier.fillMaxSize()
                 )
             }
-            MediaKind.AUDIO -> AudioHero(themeSettings, active = true)
+            MediaKind.AUDIO, MediaKind.MEDIA -> AudioHero(themeSettings, active = true)
             MediaKind.NONE -> EmptyStage(themeSettings)
         }
 
@@ -515,7 +669,7 @@ private fun PlayerStage(
                 when (mediaKind) {
                     MediaKind.AUDIO -> "AUDIO"
                     MediaKind.VIDEO -> "VIDEO"
-                    MediaKind.STREAM -> "STREAM"
+                    MediaKind.MEDIA -> "MEDIA"
                     MediaKind.NONE -> "READY"
                 },
                 fontSize = 10.sp,
@@ -546,8 +700,8 @@ private fun EmptyStage(settings: ThemeSettings) {
             }
         }
         Spacer(Modifier.height(18.dp))
-        Text("Bereit für dein Medium", fontWeight = FontWeight.SemiBold)
-        Text("Audio • Video • Stream", color = Color.White.copy(alpha = .42f), fontSize = 12.sp)
+        Text("Bereit für deine Playlist", fontWeight = FontWeight.SemiBold)
+        Text("Audio • Video • mehrere Dateien", color = Color.White.copy(alpha = .42f), fontSize = 12.sp)
     }
 }
 
@@ -622,13 +776,19 @@ private fun TransportCard(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(
+                onClick = { player.seekToPreviousMediaItem() },
+                enabled = player.hasPreviousMediaItem()
+            ) {
+                Icon(Icons.Filled.SkipPrevious, "Vorheriger Track")
+            }
             IconButton(onClick = { player.seekBack() }, enabled = player.mediaItemCount > 0) {
                 Icon(Icons.Filled.Replay10, "10 Sekunden zurück")
             }
-            Spacer(Modifier.width(18.dp))
+            Spacer(Modifier.width(6.dp))
             Surface(
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(70.dp)
                     .clickable(enabled = player.mediaItemCount > 0) {
                         if (player.isPlaying) player.pause() else player.play()
                     },
@@ -645,9 +805,15 @@ private fun TransportCard(
                     )
                 }
             }
-            Spacer(Modifier.width(18.dp))
+            Spacer(Modifier.width(6.dp))
             IconButton(onClick = { player.seekForward() }, enabled = player.mediaItemCount > 0) {
                 Icon(Icons.Filled.Forward10, "10 Sekunden vor")
+            }
+            IconButton(
+                onClick = { player.seekToNextMediaItem() },
+                enabled = player.hasNextMediaItem()
+            ) {
+                Icon(Icons.Filled.SkipNext, "Nächster Track")
             }
         }
     }
@@ -655,22 +821,22 @@ private fun TransportCard(
 
 @Composable
 private fun QuickActions(
-    onOpenFile: () -> Unit,
-    onStream: () -> Unit,
+    onAdd: () -> Unit,
+    onClear: () -> Unit,
     onDesign: () -> Unit
 ) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         ActionTile(
             modifier = Modifier.weight(1f),
-            icon = { Icon(Icons.Filled.FolderOpen, null) },
-            title = "Datei",
-            onClick = onOpenFile
+            icon = { Icon(Icons.Filled.Add, null) },
+            title = "Medien",
+            onClick = onAdd
         )
         ActionTile(
             modifier = Modifier.weight(1f),
-            icon = { Icon(Icons.Filled.Link, null) },
-            title = "Stream",
-            onClick = onStream
+            icon = { Icon(Icons.Filled.DeleteOutline, null) },
+            title = "Leeren",
+            onClick = onClear
         )
         ActionTile(
             modifier = Modifier.weight(1f),
@@ -678,6 +844,169 @@ private fun QuickActions(
             title = "Design",
             onClick = onDesign
         )
+    }
+}
+
+@Composable
+private fun PlaylistPanel(
+    tracks: List<LocalTrack>,
+    currentIndex: Int,
+    isPlaying: Boolean,
+    primary: Color,
+    shuffleEnabled: Boolean,
+    repeatMode: Int,
+    onTrackClick: (Int) -> Unit,
+    onRemoveTrack: (Int) -> Unit,
+    onToggleShuffle: () -> Unit,
+    onCycleRepeat: () -> Unit
+) {
+    GlassCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Filled.MusicNote, null, tint = primary)
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text("PLAYLIST", fontWeight = FontWeight.Black, letterSpacing = 1.2.sp)
+                Text(
+                    if (tracks.size == 1) "1 Medium" else "${tracks.size} Medien",
+                    fontSize = 11.sp,
+                    color = Color.White.copy(alpha = .45f)
+                )
+            }
+            IconButton(onClick = onToggleShuffle, enabled = tracks.size > 1) {
+                Icon(
+                    Icons.Filled.Shuffle,
+                    "Shuffle",
+                    tint = if (shuffleEnabled) primary else Color.White.copy(alpha = .55f)
+                )
+            }
+            IconButton(onClick = onCycleRepeat, enabled = tracks.isNotEmpty()) {
+                Icon(
+                    if (repeatMode == Player.REPEAT_MODE_ONE) Icons.Filled.RepeatOne else Icons.Filled.Repeat,
+                    "Wiederholen",
+                    tint = if (repeatMode == Player.REPEAT_MODE_OFF) Color.White.copy(alpha = .55f) else primary
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+        HorizontalDivider(color = Color.White.copy(alpha = .07f))
+        Spacer(Modifier.height(8.dp))
+
+        if (tracks.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Noch keine Tracks", fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Tippe auf Medien und wähle mehrere Dateien aus.",
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = .45f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            tracks.forEachIndexed { index, track ->
+                TrackRow(
+                    track = track,
+                    index = index,
+                    active = index == currentIndex,
+                    playing = index == currentIndex && isPlaying,
+                    primary = primary,
+                    onClick = { onTrackClick(index) },
+                    onRemove = { onRemoveTrack(index) }
+                )
+                if (index != tracks.lastIndex) {
+                    Spacer(Modifier.height(6.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrackRow(
+    track: LocalTrack,
+    index: Int,
+    active: Boolean,
+    playing: Boolean,
+    primary: Color,
+    onClick: () -> Unit,
+    onRemove: () -> Unit
+) {
+    val shape = RoundedCornerShape(18.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(if (active) primary.copy(alpha = .11f) else Color.White.copy(alpha = .025f))
+            .border(
+                width = 1.dp,
+                color = if (active) primary.copy(alpha = .48f) else Color.White.copy(alpha = .04f),
+                shape = shape
+            )
+            .clickable(onClick = onClick)
+            .padding(start = 12.dp, top = 10.dp, bottom = 10.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            modifier = Modifier.size(38.dp),
+            shape = CircleShape,
+            color = if (active) primary.copy(alpha = .20f) else Color.White.copy(alpha = .06f)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                if (track.kind == MediaKind.VIDEO) {
+                    Icon(Icons.Filled.VideoLibrary, null, modifier = Modifier.size(19.dp), tint = if (active) primary else Color.White.copy(alpha = .65f))
+                } else {
+                    Icon(Icons.Filled.MusicNote, null, modifier = Modifier.size(19.dp), tint = if (active) primary else Color.White.copy(alpha = .65f))
+                }
+            }
+        }
+        Spacer(Modifier.width(11.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                track.name,
+                fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                fontSize = 13.sp,
+                maxLines = 1,
+                color = if (active) Color.White else Color.White.copy(alpha = .82f)
+            )
+            Spacer(Modifier.height(3.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "${index + 1}. ${kindLabel(track.kind)}",
+                    fontSize = 10.sp,
+                    color = Color.White.copy(alpha = .42f)
+                )
+                if (track.durationHintMs > 0) {
+                    Text(
+                        "  •  ${formatTime(track.durationHintMs)}",
+                        fontSize = 10.sp,
+                        color = Color.White.copy(alpha = .42f)
+                    )
+                }
+                if (active) {
+                    Text(
+                        if (playing) "  •  JETZT" else "  •  PAUSE",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primary
+                    )
+                }
+            }
+        }
+        IconButton(onClick = onRemove) {
+            Icon(
+                Icons.Filled.Close,
+                contentDescription = "Track entfernen",
+                modifier = Modifier.size(18.dp),
+                tint = Color.White.copy(alpha = .42f)
+            )
+        }
     }
 }
 
@@ -714,38 +1043,6 @@ private fun GlassCard(content: @Composable ColumnScope.() -> Unit) {
             .border(1.dp, Color.White.copy(alpha = .08f), RoundedCornerShape(24.dp))
             .padding(16.dp),
         content = content
-    )
-}
-
-@Composable
-private fun StreamDialog(onDismiss: () -> Unit, onOpen: (String) -> Unit) {
-    var value by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Filled.Link, null) },
-        title = { Text("Stream öffnen") },
-        text = {
-            Column {
-                Text(
-                    "Direkte Medien-URL einfügen, z. B. HLS (.m3u8), DASH (.mpd), RTSP oder normale HTTP/HTTPS-Mediendateien.",
-                    color = Color.White.copy(alpha = .65f),
-                    fontSize = 13.sp
-                )
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = { value = it },
-                    label = { Text("Medien-URL") },
-                    singleLine = true
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { if (value.isNotBlank()) onOpen(value) }, enabled = value.isNotBlank()) {
-                Text("Öffnen")
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } }
     )
 }
 
@@ -952,6 +1249,70 @@ private fun ChannelSlider(label: String, value: Float, tint: Color, onChange: (F
         Text(label, color = tint, fontWeight = FontWeight.Bold, modifier = Modifier.width(18.dp), fontSize = 11.sp)
         Slider(value = value, onValueChange = onChange, valueRange = 0f..255f, modifier = Modifier.weight(1f))
         Text(value.toInt().toString(), modifier = Modifier.width(34.dp), textAlign = TextAlign.End, fontSize = 10.sp)
+    }
+}
+
+private fun buildTrack(context: Context, uri: Uri): LocalTrack {
+    val name = displayName(context, uri) ?: uri.lastPathSegment ?: "Medium"
+    val mime = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
+    return LocalTrack(
+        uri = uri,
+        name = name,
+        mime = mime,
+        kind = detectMediaKind(name, mime),
+        durationHintMs = readDuration(context, uri)
+    )
+}
+
+private fun LocalTrack.toMediaItem(): MediaItem {
+    return MediaItem.Builder()
+        .setUri(uri)
+        .setMediaId(uri.toString())
+        .setMediaMetadata(
+            MediaMetadata.Builder()
+                .setTitle(name)
+                .build()
+        )
+        .build()
+}
+
+private fun detectMediaKind(name: String, mime: String): MediaKind {
+    if (mime.startsWith("video/")) return MediaKind.VIDEO
+    if (mime.startsWith("audio/")) return MediaKind.AUDIO
+
+    val extension = name.substringAfterLast('.', "").lowercase()
+    return when (extension) {
+        "mp4", "mkv", "webm", "mov", "m4v", "3gp", "ts", "m2ts" -> MediaKind.VIDEO
+        "mp3", "m4a", "aac", "flac", "wav", "ogg", "opus", "wma", "amr" -> MediaKind.AUDIO
+        else -> MediaKind.MEDIA
+    }
+}
+
+private fun kindLabel(kind: MediaKind): String = when (kind) {
+    MediaKind.AUDIO -> "Audio"
+    MediaKind.VIDEO -> "Video"
+    MediaKind.MEDIA -> "Medium"
+    MediaKind.NONE -> "Bereit"
+}
+
+private fun takeReadPermission(context: Context, uri: Uri) {
+    runCatching {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    }
+}
+
+private fun readDuration(context: Context, uri: Uri): Long {
+    val retriever = MediaMetadataRetriever()
+    return try {
+        retriever.setDataSource(context, uri)
+        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+    } catch (_: Exception) {
+        0L
+    } finally {
+        runCatching { retriever.release() }
     }
 }
 

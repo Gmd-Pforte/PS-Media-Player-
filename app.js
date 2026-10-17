@@ -122,21 +122,33 @@ async function recordStream(songId){if(!verifiedListener||!songId)return;const s
 
 async function restoreListenerView(){if(!verifiedListener||!catalogReady)return;let saved;try{saved=JSON.parse(sessionStorage.getItem(psViewKey)||'null')}catch{}if(!saved)return;if(saved.view==='album'&&saved.id)showAlbum(saved.id);else if(saved.view==='playlists'||saved.view==='playlist'){showPlaylistLibrary();if(saved.view==='playlist'&&saved.id){const found=playlists.find(p=>p.id===saved.id);if(found)await openPlaylistDetail(found);else{await refreshPlaylists();const p=playlists.find(x=>x.id===saved.id);if(p)await openPlaylistDetail(p)}}}}
 
+
 async function loadEditorialSpotlight(){
  const root=$('editorial-spotlight');if(!root||!verifiedListener)return;
  try{
-  const settings=await listenerRequest('psms_editorial_spotlight?select=song_id,heading,message&enabled=eq.true&limit=1');
-  const pick=settings?.[0];const song=allSongs().find(t=>t.key===pick?.song_id);
-  if(!pick||!song){root.classList.add('hidden');return}
-  const artist=artistProfiles.find(a=>a.artist_name===song.artist);
-  root.replaceChildren();const art=document.createElement('div');art.className='ps-editorial-art';const source=safeImg(song.cover_url||artist?.logo_url);
-  if(source){const img=document.createElement('img');img.src=source;img.alt='Songcover';art.append(img)}else art.textContent='♫';
-  const info=document.createElement('div');info.className='ps-editorial-copy';const label=document.createElement('span');label.className='ps-editorial-kicker';label.textContent='✦ PS MUSIC STREAM · SPOTLIGHT';
-  const heading=document.createElement('h2');heading.textContent=pick.heading||'Redaktion empfiehlt';
-  const title=document.createElement('h3');title.textContent=song.title;
-  const by=document.createElement('p');by.textContent=song.artist;
-  const comment=document.createElement('p');comment.className='ps-editorial-comment';comment.textContent=pick.message||'Entdecke unseren ausgewählten Song.';
-  const play=document.createElement('button');play.className='btn';play.textContent='▶ Jetzt anhören';play.onclick=()=>{currentQueue=allSongs().filter(t=>t.artist===song.artist&&t.audio_url);playDirect(song)};
-  info.append(label,heading,title,by,comment,play);root.append(art,info);root.classList.remove('hidden')
- }catch(e){console.warn('Redaktionsempfehlung:',e)}
+  const slots=await listenerRequest('psms_editorial_slots?select=slot,song_id,heading,message&enabled=eq.true&order=slot.asc');
+  const picks=(slots||[]).map(slot=>({slot,song:allSongs().find(x=>x.key===slot.song_id)})).filter(x=>x.song);
+  root.replaceChildren();if(!picks.length){root.classList.add('hidden');return}
+  const top=document.createElement('div');top.className='ps-editorial-slider-header';
+  const heading=document.createElement('h2');heading.textContent='✦ Redaktion empfiehlt';
+  const controls=document.createElement('div');controls.className='ps-editorial-arrows';
+  const prev=document.createElement('button'),next=document.createElement('button');
+  prev.textContent='❮';next.textContent='❯';prev.type=next.type='button';prev.setAttribute('aria-label','Vorherige Empfehlung');next.setAttribute('aria-label','Nächste Empfehlung');controls.append(prev,next);top.append(heading,controls);
+  const slider=document.createElement('div');slider.className='ps-editorial-slider';
+  for(const {slot,song} of picks){
+   const card=document.createElement('article');card.className='ps-editorial-slide';const artist=artistProfiles.find(a=>a.artist_name===song.artist);
+   const art=document.createElement('div');art.className='ps-editorial-slide-art';const url=safeImg(song.cover_url||artist?.logo_url);
+   if(url){const img=document.createElement('img');img.src=url;img.alt='Cover zu '+song.title;art.append(img)}else art.textContent='♫';
+   const content=document.createElement('div');content.className='ps-editorial-slide-content';
+   const label=document.createElement('span');label.className='ps-editorial-kicker';label.textContent='✦ EMPFEHLUNG '+slot.slot;
+   const title=document.createElement('h3');title.textContent=song.title;
+   const name=document.createElement('p');name.className='ps-editorial-artist';name.textContent=song.artist;
+   const note=document.createElement('p');note.className='ps-editorial-slide-note';note.textContent=slot.message||'Unsere Redaktion empfiehlt diesen Song.';
+   const play=document.createElement('button');play.className='btn';play.textContent='▶ Jetzt anhören';play.onclick=()=>{currentQueue=allSongs().filter(t=>t.artist===song.artist&&t.audio_url);playDirect(song)};
+   content.append(label,title,name,note,play);card.append(art,content);slider.append(card)
+  }
+  prev.onclick=()=>slider.scrollBy({left:-slider.clientWidth*.85,behavior:'smooth'});
+  next.onclick=()=>slider.scrollBy({left:slider.clientWidth*.85,behavior:'smooth'});
+  root.append(top,slider);root.classList.remove('hidden')
+ }catch(e){console.warn('Redaktionsempfehlungen:',e)}
 }

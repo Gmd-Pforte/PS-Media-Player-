@@ -152,3 +152,15 @@ body:not(.ps-admin-body) .player{background:linear-gradient(125deg,#151332,#0e2a
 @keyframes ps-cover-rise{from{opacity:.5;transform:translateY(15px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:650px){#player.expanded .ps-album-art{width:min(70vw,340px);height:min(70vw,340px)}#player.expanded .ps-album-stage{gap:15px;margin:15px auto}#player.expanded .ps-album-caption strong{font-size:25px}}
 @media(prefers-reduced-motion:reduce){#player.expanded .ps-album-art{animation:none}}
+
+/* PS Music Stream normal website navigation */
+.ps-main-nav{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.ps-main-nav button{border-radius:16px;border:1px solid #886bce6e;background:linear-gradient(120deg,#251a44,#122f38);color:#f5ebff;padding:12px 17px;box-shadow:0 0 19px #8e45ec20}
+.ps-main-nav button:hover{background:linear-gradient(120deg,#41286e,#195364);box-shadow:0 0 21px #a26df36d}
+.ps-site-footer{margin-top:70px;border-top:1px solid #8468bf55;padding:28px 12px 24px;color:#b8b5cb;background:linear-gradient(180deg,#11142744,#141329a3);border-radius:18px}
+.ps-site-footer strong{font-size:19px;color:#d7fff0;text-shadow:0 0 16px #54eec46b}
+.ps-site-footer p{margin:7px 0 22px}
+.ps-footer-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ps-footer-links a{display:inline-flex;align-items:center;padding:10px 15px;text-decoration:none;background:#22223e;border:1px solid #6f5e93;border-radius:12px;color:#e9e6ff}
+.ps-footer-links a:hover{border-color:#8aeccc}
+@media(max-width:600px){.ps-main-nav{width:100%;justify-content:flex-start}.ps-main-nav button{flex:1}.ps-footer-links{flex-direction:column;align-items:stretch}.ps-footer-links #listener-session{justify-content:flex-start}}

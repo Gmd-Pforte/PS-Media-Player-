@@ -164,3 +164,26 @@ body:not(.ps-admin-body) .player{background:linear-gradient(125deg,#151332,#0e2a
 .ps-footer-links a{display:inline-flex;align-items:center;padding:10px 15px;text-decoration:none;background:#22223e;border:1px solid #6f5e93;border-radius:12px;color:#e9e6ff}
 .ps-footer-links a:hover{border-color:#8aeccc}
 @media(max-width:600px){.ps-main-nav{width:100%;justify-content:flex-start}.ps-main-nav button{flex:1}.ps-footer-links{flex-direction:column;align-items:stretch}.ps-footer-links #listener-session{justify-content:flex-start}}
+
+/* Artist Center V2 – navigation-first dashboard */
+body:has(.ps-studio-shell){background:#080b14}
+.ps-studio-shell{display:grid;grid-template-columns:245px minmax(0,1fr);gap:22px;align-items:start}
+.ps-studio-side{position:sticky;top:16px;background:linear-gradient(175deg,#18152def,#0e2226f2);border:1px solid #936ae54f;border-radius:22px;padding:20px 13px;box-shadow:0 14px 50px #0009}
+.ps-studio-logo{font-size:24px;font-weight:950;letter-spacing:-.04em;padding:6px 9px 24px}.ps-studio-logo span{color:#69eacd}.ps-studio-logo small{display:block;color:#aab5ca;font-size:10px;letter-spacing:.17em;margin-top:4px}
+.ps-studio-nav{display:flex;flex-direction:column;gap:7px}
+.ps-studio-nav button{text-align:left;border:1px solid transparent;background:transparent;color:#b9c4db;border-radius:12px;padding:13px 14px;font-weight:700}
+.ps-studio-nav button.active,.ps-studio-nav button:hover{background:linear-gradient(110deg,#6240a9,#19535c);color:#fff;border-color:#9b7ff3a1;box-shadow:0 0 18px #7651de36}
+.ps-studio-public-link{display:block;padding:18px 10px 5px;color:#7cf5d1;text-decoration:none;font-size:13px}
+.ps-studio-main{min-width:0}.ps-studio-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:19px}
+.ps-studio-top h1{margin:7px 0;font-size:clamp(29px,5vw,45px)}.ps-studio-eyebrow,.ps-onboard-progress{font-size:10px;font-weight:850;letter-spacing:.18em;color:#71f4d4}
+.ps-studio-online{color:#86e4c8;font-size:12px}
+.ps-studio-card,.ps-onboard,.ps-studio-welcome{border:1px solid #7c61ca70;border-radius:23px;background:linear-gradient(135deg,#1a1530ed,#121c29ef);padding:clamp(18px,3vw,28px);box-shadow:0 18px 55px #0007}
+.ps-studio-card h2{margin-top:0}.ps-studio-card input,.ps-studio-card textarea{max-width:100%}
+.ps-onboard{max-width:720px;margin:20px auto 50px;padding:36px}.ps-onboard h2{font-size:clamp(27px,4vw,39px)}.ps-onboard .btn{margin-top:18px;background:linear-gradient(110deg,#62e9b7,#47c3e0);color:#08242b}
+.ps-studio-welcome{background:linear-gradient(120deg,#30204d,#0e3c40);margin-bottom:18px}.ps-studio-welcome h2{font-size:clamp(25px,4vw,35px);color:#fff;text-shadow:0 0 20px #b78aff87}
+.ps-studio-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ps-studio-tile{display:flex;flex-direction:column;text-align:left;gap:8px;border:1px solid #866bc780;border-radius:17px;background:linear-gradient(140deg,#251c3c,#122c35);color:#fff;padding:22px;min-height:157px}
+.ps-studio-tile span{font-size:31px;color:#72f5d5;text-shadow:0 0 22px #70eed4}.ps-studio-tile strong{font-size:18px}.ps-studio-tile small{color:#b5c8d6}
+.ps-studio-logout{margin-top:22px}.ps-studio-release-list{margin-top:20px}.ps-studio-release-list .item{gap:13px;flex-wrap:wrap}
+.ps-studio-view.hidden,.ps-onboard.hidden,#artist-dashboard-views.hidden{display:none!important}
+@media(max-width:790px){.ps-studio-shell{grid-template-columns:1fr;gap:10px}.ps-studio-side{position:static;padding:12px}.ps-studio-logo{padding:7px 10px 10px;font-size:19px}.ps-studio-nav{flex-direction:row;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:5px}.ps-studio-nav button{flex:0 0 auto;white-space:nowrap;padding:11px 13px;scroll-snap-align:start}.ps-studio-public-link{padding:7px 10px}.ps-studio-online{display:none}.ps-studio-top{margin-top:13px}.ps-studio-quick{gap:9px}.ps-studio-tile{padding:16px;min-height:130px}.ps-onboard{padding:22px}}

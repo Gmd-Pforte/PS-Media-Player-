@@ -23,7 +23,7 @@ async function playDirect(song){
  directSong=song;const thisSequence=++streamSequence;const url=await secureAudioUrl(song.audio_url).catch(e=>{$('ps-audio-status').textContent=e.message;return null});if(!url||thisSequence!==streamSequence)return;audio.src=url;audio.load();
  $('ps-audio-status').textContent='';
  audio.play().catch(()=>{$('ps-audio-status').textContent='Zum Starten bitte ▶ tippen.'});
- $('player').classList.remove('expanded');$('expand').textContent='Groß ⌃';
+ // Größe des Players beim Songwechsel beibehalten.
 }
 function adjacent(dir){
  const tracks=currentQueue.length?currentQueue:allSongs().filter(x=>x.audio_url);

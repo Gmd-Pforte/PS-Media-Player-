@@ -90,7 +90,22 @@ function closePlaylistSelect(){ $('pl-add-backdrop').classList.add('hidden');pen
 $('pl-add-close').onclick=closePlaylistSelect;
 $('pl-add-backdrop').onclick=e=>{if(e.target===$('pl-add-backdrop'))closePlaylistSelect()};
 $('pl-add-new').onclick=()=>{$('pl-add-backdrop').classList.add('hidden');showPlaylistLibrary();togglePlaylistForm(true)};
-$('pl-add-confirm').onclick=async()=>{const id=$('pl-add-select').value;const song=pendingPlaylistSong;if(!id||!song)return;const btn=$('pl-add-confirm');btn.disabled=true;try{await listenerRequest('psms_playlist_items',{method:'POST',body:JSON.stringify({playlist_id:id,song_id:song.key})});const name=playlists.find(p=>p.id===id)?.name||'Playlist';closePlaylistSelect();$('pl-status').textContent='Song zu „'+name+'“ hinzugefügt.'}catch(err){$('pl-add-status').textContent=err.message}finally{btn.disabled=false}};
+$('pl-add-confirm').onclick=async()=>{
+ const id=$('pl-add-select').value,song=pendingPlaylistSong;if(!id||!song)return;
+ const btn=$('pl-add-confirm');btn.disabled=true;
+ const name=playlists.find(p=>p.id===id)?.name||'Playlist';
+ try{
+  await listenerRequest('psms_playlist_items',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({playlist_id:id,song_id:song.key})});
+  closePlaylistSelect();$('pl-status').textContent='✓ „'+song.title+'“ wurde zu „'+name+'“ hinzugefügt.';
+ }catch(err){
+  const message=String(err?.message||err);let confirmed=false;
+  if(/Unexpected end of JSON input|Ungültige Antwort vom Playlist-Server/i.test(message)){
+   try{const saved=await listenerRequest('psms_playlist_items?select=id&playlist_id=eq.'+encodeURIComponent(id)+'&song_id=eq.'+encodeURIComponent(song.key)+'&limit=1');confirmed=Array.isArray(saved)&&saved.length>0}catch(e){}
+  }
+  if(confirmed){closePlaylistSelect();$('pl-status').textContent='✓ „'+song.title+'“ wurde zu „'+name+'“ hinzugefügt.'}
+  else $('pl-add-status').textContent=/Unexpected end of JSON input|Ungültige Antwort vom Playlist-Server/i.test(message)?'Hinzufügen konnte nicht bestätigt werden. Bitte prüfe die Playlist.':message;
+ }finally{btn.disabled=false}
+};
 async function addToPlaylist(song){if(!song?.audio_url)return;pendingPlaylistSong=song;try{const data=await listenerRequest('psms_playlists?select=id,name&order=created_at.desc');playlists=data||[];const sel=$('pl-add-select');sel.replaceChildren();for(const p of playlists){const opt=document.createElement('option');opt.value=p.id;opt.textContent=p.name;sel.append(opt)}$('pl-add-track').textContent='Song: '+song.title+' · '+(song.artist||'Künstler');$('pl-add-status').textContent=playlists.length?'':'Du hast noch keine Playlist. Erstelle zuerst eine neue.';$('pl-add-confirm').disabled=!playlists.length;$('pl-add-backdrop').classList.remove('hidden')}catch(err){$('pl-status').textContent=err.message;showPlaylistLibrary()}}
 async function playPlaylist(id){try{const items=await listenerRequest('psms_playlist_items?select=song_id,position&playlist_id=eq.'+id+'&order=position.asc,created_at.asc');const songs=items.map(item=>allSongs().find(s=>s.key===item.song_id)).filter(Boolean);if(!songs.length){$('pl-status').textContent='Diese Playlist enthält noch keine verfügbaren Songs.';return}currentQueue=songs;playDirect(songs[0]);$('pl-status').textContent='Playlist wird abgespielt.'}catch(e){$('pl-status').textContent=e.message}}
 $('open-home').onclick=()=>{hidePlaylistLibrary();$('playlistview').classList.add('hidden');$('albumview').classList.add('hidden');$('homeview').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'})};$('pl-new').onclick=newPlaylist;$('open-playlists').onclick=showPlaylistLibrary;$('pl-back').onclick=hidePlaylistLibrary;$('pl-detail-back').onclick=()=>{$('pl-detail').classList.add('hidden');$('pl-list').classList.remove('hidden');activePlaylistId=null;refreshPlaylists()};$('ps-add-playlist').onclick=()=>addToPlaylist(directSong);

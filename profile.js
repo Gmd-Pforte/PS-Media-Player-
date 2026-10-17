@@ -2,9 +2,9 @@ const $=id=>document.getElementById(id);const param=new URLSearchParams(location
 let profileIndex=-1;
 const playerAudio=$('profile-audio');
 function profileTime(n){return Number.isFinite(n)?Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0'):'0:00'}
-function playProfile(i){
+async function playProfile(i){
  const songs=window.profileTracks||[];if(!songs.length)return;profileIndex=(i+songs.length)%songs.length;
- const t=songs[profileIndex];playerAudio.src=t.audio_url;playerAudio.load();
+ const t=songs[profileIndex];let ss;try{ss=JSON.parse(localStorage.getItem('psms_listener_session')||'null')}catch{}if(!ss?.access_token){location.href='listener.html';return}const valid=await fetch(API+'/auth/v1/user',{headers:{apikey:ANON,Authorization:'Bearer '+ss.access_token}});if(!valid.ok){location.href='listener.html';return}const prefix=API+'/storage/v1/object/public/ps-music-audio/';if(!t.audio_url.startsWith(prefix))return;const path=t.audio_url.slice(prefix.length);const signed=await fetch(API+'/storage/v1/object/sign/ps-music-audio/'+path,{method:'POST',headers:{apikey:ANON,Authorization:'Bearer '+ss.access_token,'Content-Type':'application/json'},body:JSON.stringify({expiresIn:3600})});if(!signed.ok){$('profile-status').textContent='Bitte erneut anmelden';return}const d=await signed.json();playerAudio.src=API+'/storage/v1'+d.signedURL;playerAudio.load();
  $('ptitle').textContent=t.title;$('partist').textContent=$('artistname').textContent;
  $('player').hidden=false;$('profile-status').textContent='Titel '+(profileIndex+1)+' von '+songs.length+' · automatische Wiedergabe';
  playerAudio.play().catch(()=>$('profile-status').textContent='Zum Starten ▶ antippen.');

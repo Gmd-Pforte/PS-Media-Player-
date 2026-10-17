@@ -23,3 +23,15 @@
 #player.expanded .ps-controls{gap:22px;margin:32px 0}
 #player.expanded .ps-controls button{width:52px;height:52px}
 #player.expanded .ps-controls #ps-play{width:78px;height:78px}
+
+/* Artist releases / listener experience */
+.release-thumb{height:66px;width:66px;object-fit:cover;border-radius:10px;flex-shrink:0}
+.ps-song-row{display:flex;align-items:stretch;gap:8px;margin-bottom:8px}
+.ps-song-row>.song{flex:1;min-width:0}
+.ps-add-song{min-width:44px}
+#listener-session{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+#albums.grid .tile{overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;transition:transform .2s ease,background .2s ease}
+#albums.grid .tile:hover{transform:translateY(-3px)}
+#albums.grid .tile .cover{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:12px}
+#albums.grid .tile strong{font-size:16px}
+#player.expanded{box-shadow:0 -16px 70px #000b}

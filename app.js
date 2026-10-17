@@ -7,7 +7,7 @@ function showAlbum(id){const a=db.albums.find(a=>a.key===id);if(!a)return;select
 $('back').onclick=()=>{$('albumview').classList.add('hidden');$('homeview').classList.remove('hidden')};
 document.addEventListener('click',e=>{const a=e.target.closest('[data-album]');if(a)showAlbum(a.dataset.album);const b=e.target.closest('[data-song]');if(b){const s=allSongs().find(x=>x.key===b.dataset.song);if(s){currentQueue=allSongs().filter(x=>x.audio_url&&x.artist===s.artist);play(s)}}});$('q').oninput=render;
 function play(s){if(!verifiedListener){location.href='listener.html';return}if(s.audio_url)playDirect(s)}$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');$('expand').textContent=yes?'Klein ⌄':'Groß ⌃'};$('close').onclick=()=>{stopDirect();$('player').hidden=true};render();Promise.all([request('psms_artist_songs?select=id,title,audio_url,cover_url,album_title,owner_id,psms_artists(artist_name)&hidden=eq.false&audio_url=not.is.null&order=created_at.desc'),request('psms_artists?select=user_id,artist_name,logo_url,banner_url,bio&order=created_at.desc')]).then(([artists,profiles])=>{artistProfiles=profiles||[];db={albums:[],singles:artists.map(t=>({key:t.id,title:t.title,artist:t.psms_artists?.artist_name||'Künstler',audio_url:t.audio_url,cover_url:t.cover_url,album_title:t.album_title}))};render()}).catch(err=>{console.error(err);document.getElementById('songs').innerHTML='<div class="empty">Supabase noch nicht erreichbar. Bitte später neu laden.</div>'});
-let verifiedListener=null;let streamSequence=0;let streamReported=false;let streamSongId=null;
+let verifiedListener=null;let streamSequence=0;let streamReported=false;let streamSongId=null;let listenedSeconds=0;let lastPlayhead=null;
 const audio=$('ps-audio');let directSong=null;let repeatOne=false;let currentQueue=[];let playlists=[];let shuffle=false;audio.volume=.8;
 function stopDirect(){++streamSequence;audio.pause();audio.removeAttribute('src');audio.load();directSong=null}
 function formatTime(n){if(!Number.isFinite(n))return '0:00';return Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0')}
@@ -20,7 +20,7 @@ async function playDirect(song){
  $('ptitle').textContent=song.title;$('partist').textContent=song.artist||'Künstler';
  const artwork=song.cover_url||artistProfiles.find(a=>a.artist_name===song.artist)?.logo_url||song.cover;
  $('pcover').innerHTML=cover(artwork);$('ps-cover-large').innerHTML=cover(artwork);$('ps-title-large').textContent=song.title;$('ps-artist-large').textContent=song.artist||'Künstler';$('player').style.setProperty('--song-cover',safeImg(artwork)?'url("'+safeImg(artwork)+'")':'none');
- directSong=song;streamSongId=song.key;streamReported=false;const thisSequence=++streamSequence;const url=await secureAudioUrl(song.audio_url).catch(e=>{$('ps-audio-status').textContent=e.message;return null});if(!url||thisSequence!==streamSequence)return;audio.src=url;audio.load();
+ directSong=song;streamSongId=song.key;streamReported=false;listenedSeconds=0;lastPlayhead=null;const thisSequence=++streamSequence;const url=await secureAudioUrl(song.audio_url).catch(e=>{$('ps-audio-status').textContent=e.message;return null});if(!url||thisSequence!==streamSequence)return;audio.src=url;audio.load();
  $('ps-audio-status').textContent='';
  audio.play().catch(()=>{$('ps-audio-status').textContent='Zum Starten bitte ▶ tippen.'});
  // Größe des Players beim Songwechsel beibehalten.
@@ -35,7 +35,7 @@ $('ps-play').onclick=()=>audio.paused?audio.play().catch(e=>$('ps-audio-status')
 $('ps-prev').onclick=()=>adjacent(-1);$('ps-next').onclick=()=>adjacent(1);
 $('ps-loop').onclick=()=>{repeatOne=!repeatOne;audio.loop=repeatOne;$('ps-loop').classList.toggle('active',repeatOne)};
 $('ps-volume').oninput=e=>audio.volume=Number(e.target.value)/100;
-audio.ontimeupdate=()=>{if(!streamReported&&directSong&&streamSongId===directSong.key&&audio.currentTime>=30&&!audio.paused){streamReported=true;recordStream(directSong.key).catch(e=>console.warn('Streamzählung:',e.message))}$('ps-time').textContent=formatTime(audio.currentTime);if(Number.isFinite(audio.duration)&&audio.duration>0)$('ps-seek').value=Math.round(audio.currentTime/audio.duration*100)};
+audio.ontimeupdate=()=>{if(lastPlayhead!==null&&!audio.paused){const delta=audio.currentTime-lastPlayhead;if(delta>0&&delta<2.5)listenedSeconds+=delta}lastPlayhead=audio.currentTime;if(!streamReported&&directSong&&streamSongId===directSong.key&&listenedSeconds>=30){streamReported=true;recordStream(directSong.key).catch(e=>console.warn('Streamzählung:',e.message))}$('ps-time').textContent=formatTime(audio.currentTime);if(Number.isFinite(audio.duration)&&audio.duration>0)$('ps-seek').value=Math.round(audio.currentTime/audio.duration*100)};
 audio.onloadedmetadata=()=>{$('ps-duration').textContent=formatTime(audio.duration)};
 audio.onplay=()=>{$('ps-play').textContent='⏸'};audio.onpause=()=>{$('ps-play').textContent='▶'};
 audio.onended=()=>{if(!repeatOne)adjacent(1)};

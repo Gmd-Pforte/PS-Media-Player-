@@ -116,3 +116,21 @@ body:not(.ps-admin-body) .player{background:linear-gradient(125deg,#151332,#0e2a
 .ps-head-accent{color:#76fbd4;text-shadow:0 0 18px #58f7bd}
 @media(max-width:600px){body:not(.ps-admin-body) .wrap{padding:10px 12px 200px}body:not(.ps-admin-body) .top{padding:14px 12px;border-radius:18px;flex-wrap:wrap}body:not(.ps-admin-body) .brand{font-size:21px}body:not(.ps-admin-body) .hero{min-height:300px;padding:26px 20px!important;border-radius:26px}body:not(.ps-admin-body) .hero-content{max-width:77%}.hero-orb{right:-68px;width:185px;opacity:.78}body:not(.ps-admin-body) .hero h1{font-size:clamp(36px,8.5vw,53px)}.ps-featured-grid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,44%);grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 15px}.ps-feature-card{scroll-snap-align:start}.ps-feature-card strong{font-size:14px}.ps-section-heading span{font-size:11px}body:not(.ps-admin-body) .song{min-height:69px}}
 @media(prefers-reduced-motion:reduce){.hero-orb,body:not(.ps-admin-body) .hero:before{animation:none}}
+
+/* Dedicated neon playlist library */
+.ps-playlist-page{padding:20px 0 60px;min-height:65vh}
+.ps-pl-top{position:relative;overflow:hidden;border:1px solid #a36fff72;border-radius:28px;background:linear-gradient(130deg,#261342e8,#14364af0);padding:30px;margin-bottom:25px;box-shadow:0 18px 65px #731fe149}
+.ps-pl-top:before{content:"♫";position:absolute;right:7%;top:4%;font-size:180px;font-weight:900;color:#c970ff21;transform:rotate(-18deg);pointer-events:none}
+.ps-pl-top>*{position:relative}.ps-pl-top h1{color:#fff;text-shadow:0 0 35px #d67bffaa}
+.ps-playlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.ps-pl-card{border:1px solid #b37dff6a;background:linear-gradient(145deg,#25183de8,#132b35dc);border-radius:22px;padding:18px;display:flex;flex-wrap:wrap;align-items:center;gap:13px;box-shadow:0 10px 40px #0009}
+.ps-pl-art{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#b54cfd,#09dbc0);display:grid;place-items:center;font-size:41px;color:#fff;box-shadow:0 6px 27px #8f61ff73}
+.ps-pl-info{flex:1;min-width:105px}.ps-pl-info strong{font-size:18px;text-shadow:0 0 14px #c48cffb2;display:block;overflow-wrap:anywhere}.ps-pl-info small{color:#b6c0dc}
+.ps-pl-card .btn{border-radius:13px}
+.ps-pl-detail{margin-top:18px;border:1px solid #8871c26e;background:linear-gradient(150deg,#17132dde,#0b262bde);border-radius:25px;padding:22px;box-shadow:0 20px 60px #0008}
+.ps-pl-detail h2{font-size:28px;text-shadow:0 0 20px #b36dffb0}
+.ps-pl-track{display:flex;align-items:center;gap:13px;padding:11px;margin:10px 0;background:#151b30e8;border:1px solid #715f9b75;border-radius:17px}
+.ps-pl-track-cover{width:60px;height:60px;flex-shrink:0;border-radius:12px;background:linear-gradient(135deg,#792beb,#13877e);display:grid;place-items:center;font-size:28px;overflow:hidden}
+.ps-pl-track-cover img{width:100%;height:100%;object-fit:cover}
+.ps-pl-track-info{flex:1;min-width:0}.ps-pl-track-info strong{display:block;overflow-wrap:anywhere;color:#fff;text-shadow:0 0 12px #bd8cff8a}.ps-pl-track-info small{color:#aebacf}
+@media(max-width:560px){.ps-pl-top{padding:22px 18px}.ps-playlist-grid{grid-template-columns:1fr}.ps-pl-detail{padding:12px}.ps-pl-track{gap:8px;padding:8px}.ps-pl-track-cover{width:48px;height:48px}.ps-pl-track .btn{padding:9px;font-size:12px}}

@@ -43,3 +43,35 @@
 .profile-player-ui #profile-play{width:68px;height:68px;background:linear-gradient(140deg,#50ffba,#0eac74);color:#052518;box-shadow:0 8px 28px #0cc58a45;font-size:26px}
 .profile-player-ui #profile-status{font-size:12px;text-align:center;margin:8px 0 3px;color:#9bb5aa}
 .player .phead .info{min-width:0;overflow:hidden}.player .phead strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* PS MUSIC STREAM 2026 - animated aurora and artist insight */
+body:not(.ps-admin-body){background:#080912;position:relative;isolation:isolate}
+body:not(.ps-admin-body)::before{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 32% 35% at 20% 34%,#9933e76b,transparent 75%),radial-gradient(ellipse 33% 38% at 80% 50%,#05a9b65a,transparent 72%),radial-gradient(ellipse 35% 33% at 50% 77%,#2b56df47,transparent 76%);filter:blur(62px);animation:ps-aurora 19s ease-in-out infinite alternate;will-change:transform}
+body:not(.ps-admin-body)::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 20%,#9847e50b 50%,transparent 85%)}
+@keyframes ps-aurora{0%{transform:translate(-6%,0) rotate(-6deg) scale(1)}50%{transform:translate(4%,-4%) rotate(7deg) scale(1.15)}100%{transform:translate(-2%,7%) rotate(-4deg) scale(1.04)}}
+body:not(.ps-admin-body) .hero{background:linear-gradient(130deg,#20132ac9,#111a2abe);border:1px solid #ae79f459;backdrop-filter:blur(16px);box-shadow:0 22px 90px #01020370, inset 0 1px #ffffff18}
+body:not(.ps-admin-body) .hero h1{color:#fff;text-shadow:0 0 23px #cc82ff7a,0 0 58px #955bff4d}
+body:not(.ps-admin-body) h2{color:#f5efff;text-shadow:0 0 18px #b17cff56}
+body:not(.ps-admin-body) .song strong,body:not(.ps-admin-body) .tile strong{color:#fff;text-shadow:0 0 12px #bb91ff78,0 0 28px #876bff28}
+body:not(.ps-admin-body) .tile,body:not(.ps-admin-body) .panel,body:not(.ps-admin-body) .artist-card{backdrop-filter:blur(14px);box-shadow:0 10px 32px #0005}
+body:not(.ps-admin-body) .song:hover,body:not(.ps-admin-body) .tile:hover{box-shadow:0 0 24px #a77ff62d;filter:brightness(1.08)}
+body:not(.ps-admin-body) .cover{box-shadow:0 5px 22px #0006}
+@media(prefers-reduced-motion:reduce){body:not(.ps-admin-body)::before{animation:none}}
+.adm-artist-workspace{display:grid;grid-template-columns:minmax(230px,.8fr) minmax(0,1.5fr);gap:18px}
+.adm-artist-chooser{max-height:72vh;overflow:auto}.adm-artist-chooser .adminrow{flex-wrap:wrap}
+.adm-artist-inspector{border:1px solid #38413d;background:#101915;border-radius:18px;padding:19px;min-height:340px}
+.adm-inspector-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}.adm-inspector-head h2{margin:0}
+.adm-inspector-avatar{width:76px;height:76px;border-radius:18px;object-fit:cover}.adm-inspector-banner{width:100%;max-height:190px;object-fit:cover;border-radius:14px;margin-bottom:14px}
+.adm-empty-art{width:70px;height:70px;border-radius:14px;background:#253530;display:grid;place-items:center;font-size:28px}
+.adm-inspector-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid #365044}
+.adm-inspector-tabs button{background:#25322b;color:#cddbd2;border:1px solid #405147;border-radius:12px;padding:10px 13px}
+.adm-inspector-tabs button.selected{background:#1ca878;color:#05241b;border-color:#43efb2;font-weight:800}
+.adm-inspector-body{padding-top:13px}
+.adm-release-card,.adm-playlist-card{border:1px solid #35443d;background:#18231e;border-radius:14px;padding:12px;display:flex;align-items:center;gap:13px;margin:9px 0}
+.adm-release-art{width:67px;height:67px;object-fit:cover;border-radius:12px}
+.adm-release-card div:not(.adm-empty-art),.adm-playlist-card{min-width:0}
+.adm-release-card small,.adm-playlist-card small{display:block;color:#abbfb4;margin-top:5px;overflow-wrap:anywhere}
+.adm-playlist-card{display:block}
+.adm-detail-event{display:grid;grid-template-columns:1fr auto;gap:5px;border-bottom:1px solid #2d3b32;padding:12px 0}
+.adm-detail-event span{font-size:12px;color:#94ac9e}.adm-detail-event small{grid-column:1/-1;color:#d0dbd2;overflow-wrap:anywhere}
+@media(max-width:780px){.adm-artist-workspace{grid-template-columns:1fr}.adm-artist-chooser{max-height:280px}.adm-artist-inspector{padding:13px}body:not(.ps-admin-body)::before{filter:blur(36px)}}

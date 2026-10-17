@@ -35,3 +35,11 @@
 #albums.grid .tile .cover{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:12px}
 #albums.grid .tile strong{font-size:16px}
 #player.expanded{box-shadow:0 -16px 70px #000b}
+
+/* Elegant artist player – no native download controls */
+.profile-player-ui{padding:16px 8px 4px;background:linear-gradient(150deg,#182825,#0e1318);border-radius:18px;margin-top:14px}
+.profile-player-ui .ps-progress{padding:0 10px}
+.profile-player-ui .ps-controls{margin:14px 0 6px}
+.profile-player-ui #profile-play{width:68px;height:68px;background:linear-gradient(140deg,#50ffba,#0eac74);color:#052518;box-shadow:0 8px 28px #0cc58a45;font-size:26px}
+.profile-player-ui #profile-status{font-size:12px;text-align:center;margin:8px 0 3px;color:#9bb5aa}
+.player .phead .info{min-width:0;overflow:hidden}.player .phead strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

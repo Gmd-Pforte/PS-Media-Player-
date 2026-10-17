@@ -5,4 +5,36 @@ function renderArtists(q){const root=$('artists');if(!root)return;const items=ar
 function showAlbum(id){const a=db.albums.find(a=>a.key===id);if(!a)return;selected=id;$('homeview').classList.add('hidden');$('albumview').classList.remove('hidden');$('albumhead').innerHTML=cover(a.cover)+'<div><span class="eyebrow">Album</span><h1>'+esc(a.title)+'</h1><p>'+esc(a.artist)+' · '+a.tracks.length+' Songs</p>'+(a.url?'<a target="_blank" rel="noopener" href="'+esc(a.url)+'">Auf Suno ansehen ↗</a>':'')+'</div>';$('albumtracks').innerHTML=a.tracks.map((t,i)=>songButton({...t,artist:a.artist,cover:a.cover},i+1)).join('')||'<div class="empty">Keine Songs</div>';scrollTo(0,0)}
 $('back').onclick=()=>{$('albumview').classList.add('hidden');$('homeview').classList.remove('hidden')};
 document.addEventListener('click',e=>{const a=e.target.closest('[data-album]');if(a)showAlbum(a.dataset.album);const b=e.target.closest('[data-song]');if(b){const s=allSongs().find(x=>x.key===b.dataset.song);if(s)play(s)}});$('q').oninput=render;
-function play(s){const parsed=parseSuno(s.url);if(!parsed){alert('Ungültiger Suno-Songlink');return}$('player').hidden=false;$('ptitle').textContent=s.title;$('partist').textContent=s.artist||'PS AI MUSIC';$('pcover').innerHTML=cover(s.cover);$('frame').src='https://suno.com/embed/'+encodeURIComponent(parsed.id)+'?autoplay=1';$('player').classList.remove('expanded');$('expand').textContent='Groß ⌃'}$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');$('expand').textContent=yes?'Klein ⌄':'Groß ⌃'};$('close').onclick=()=>{$('frame').src='about:blank';$('player').hidden=true};render();Promise.all([catalog(),request('psms_artist_songs?select=id,title,suno_url,owner_id,psms_artists(artist_name)&hidden=eq.false&order=created_at.desc'),request('psms_artists?select=user_id,artist_name,logo_url,banner_url,bio&order=created_at.desc')]).then(([data,artists,profiles])=>{artistProfiles=profiles||[];db=data;db.singles.push(...artists.map(t=>({key:t.id,title:t.title,artist:t.psms_artists?.artist_name||'Künstler',url:t.suno_url})));render()}).catch(err=>{console.error(err);document.getElementById('songs').innerHTML='<div class="empty">Supabase noch nicht erreichbar. Bitte später neu laden.</div>'});
+function play(s){if(s.audio_url){playDirect(s);return}const parsed=parseSuno(s.url);if(!parsed){alert('Ungültiger Suno-Songlink');return}stopDirect();$('ps-audio-panel').classList.add('hidden');$('frame').hidden=false;$('ps-suno-note').classList.remove('hidden');$('player').hidden=false;$('ptitle').textContent=s.title;$('partist').textContent=s.artist||'PS AI MUSIC';$('pcover').innerHTML=cover(s.cover);$('frame').src='https://suno.com/embed/'+encodeURIComponent(parsed.id)+'?autoplay=1';$('player').classList.remove('expanded');$('expand').textContent='Groß ⌃'}$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');$('expand').textContent=yes?'Klein ⌄':'Groß ⌃'};$('close').onclick=()=>{$('frame').src='about:blank';stopDirect();$('player').hidden=true};render();Promise.all([catalog(),request('psms_artist_songs?select=id,title,suno_url,audio_url,owner_id,psms_artists(artist_name)&hidden=eq.false&order=created_at.desc'),request('psms_artists?select=user_id,artist_name,logo_url,banner_url,bio&order=created_at.desc')]).then(([data,artists,profiles])=>{artistProfiles=profiles||[];db=data;db.singles.push(...artists.map(t=>({key:t.id,title:t.title,artist:t.psms_artists?.artist_name||'Künstler',url:t.suno_url,audio_url:t.audio_url})));render()}).catch(err=>{console.error(err);document.getElementById('songs').innerHTML='<div class="empty">Supabase noch nicht erreichbar. Bitte später neu laden.</div>'});
+const audio=$('ps-audio');let directSong=null;let repeatOne=false;audio.volume=.8;
+function stopDirect(){audio.pause();audio.removeAttribute('src');audio.load();directSong=null}
+function formatTime(n){if(!Number.isFinite(n))return '0:00';return Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0')}
+function playDirect(song){
+ if(!song.audio_url)return;
+ if(!/^https:\/\//i.test(song.audio_url))return alert('Ungültige Audio-Adresse.');
+ $('frame').src='about:blank';$('frame').hidden=true;$('ps-suno-note').classList.add('hidden');
+ $('ps-audio-panel').classList.remove('hidden');$('player').hidden=false;
+ $('ptitle').textContent=song.title;$('partist').textContent=song.artist||'Künstler';
+ const artwork=artistProfiles.find(a=>a.artist_name===song.artist)?.logo_url||song.cover;
+ $('pcover').innerHTML=cover(artwork);
+ directSong=song;audio.src=song.audio_url;audio.load();
+ $('ps-audio-status').textContent='';
+ audio.play().catch(()=>{$('ps-audio-status').textContent='Zum Starten bitte ▶ tippen.'});
+ $('player').classList.remove('expanded');$('expand').textContent='Groß ⌃';
+}
+function adjacent(dir){
+ const tracks=allSongs().filter(x=>x.audio_url);
+ if(!tracks.length)return;
+ const i=tracks.findIndex(x=>x.key===directSong?.key);
+ playDirect(tracks[(i+dir+tracks.length)%tracks.length]);
+}
+$('ps-play').onclick=()=>audio.paused?audio.play().catch(e=>$('ps-audio-status').textContent=e.message):audio.pause();
+$('ps-prev').onclick=()=>adjacent(-1);$('ps-next').onclick=()=>adjacent(1);
+$('ps-loop').onclick=()=>{repeatOne=!repeatOne;audio.loop=repeatOne;$('ps-loop').classList.toggle('active',repeatOne)};
+$('ps-volume').oninput=e=>audio.volume=Number(e.target.value)/100;
+audio.ontimeupdate=()=>{$('ps-time').textContent=formatTime(audio.currentTime);if(Number.isFinite(audio.duration)&&audio.duration>0)$('ps-seek').value=Math.round(audio.currentTime/audio.duration*100)};
+audio.onloadedmetadata=()=>{$('ps-duration').textContent=formatTime(audio.duration)};
+audio.onplay=()=>{$('ps-play').textContent='⏸'};audio.onpause=()=>{$('ps-play').textContent='▶'};
+audio.onended=()=>{if(!repeatOne)adjacent(1)};
+audio.onerror=()=>{$('ps-audio-status').textContent='Audiodatei konnte nicht geladen werden.'};
+$('ps-seek').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};

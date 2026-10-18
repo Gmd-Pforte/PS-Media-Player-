@@ -46,3 +46,6 @@ $('admin-support-status').onclick=async()=>{if(!adminActiveTicket)return;try{con
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&session?.access_token)loadSupportTickets()});
 
 setInterval(()=>{if(!document.hidden&&session?.access_token&&!$('dashboard').classList.contains('hidden'))loadSupportTickets()},30000);
+
+$('admin-support-chat-refresh').onclick=async()=>{if(adminActiveTicket)await openAdminTicket(adminActiveTicket);await loadSupportTickets()};
+setInterval(()=>{if(!document.hidden&&session?.access_token&&sessionStorage.getItem('psms_admin_view')==='support'&&adminActiveTicket)openAdminTicket(adminActiveTicket).catch(console.warn)},8000);

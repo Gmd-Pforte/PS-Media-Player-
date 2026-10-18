@@ -14,7 +14,30 @@ function renderFeatured(q){
 function showAlbum(id){const a=db.albums.find(a=>a.key===id);if(!a)return;selected=id;saveListenerView('album',id);$('homeview').classList.add('hidden');$('albumview').classList.remove('hidden');$('albumhead').innerHTML=cover(a.cover)+'<div><span class="eyebrow">Album</span><h1>'+esc(a.title)+'</h1><p>'+esc(a.artist)+' · '+a.tracks.length+' Songs</p>'+'</div>';$('albumtracks').innerHTML=a.tracks.map((t,i)=>songButton({...t,artist:a.artist,cover:a.cover},i+1)).join('')||'<div class="empty">Keine Songs</div>';scrollTo(0,0)}
 $('back').onclick=()=>{saveListenerView('home');$('albumview').classList.add('hidden');$('homeview').classList.remove('hidden')};
 document.addEventListener('click',e=>{const a=e.target.closest('[data-album]');if(a)showAlbum(a.dataset.album);const b=e.target.closest('[data-song]');if(b){const s=allSongs().find(x=>x.key===b.dataset.song);if(s){const album=db.albums.find(a=>a.tracks.some(t=>t.key===s.key));currentQueue=album?album.tracks.filter(t=>t.audio_url):allSongs().filter(x=>x.audio_url&&!x.album_title&&x.artist===s.artist);play(s)}}});$('q').oninput=render;
-function play(s){if(!verifiedListener){location.href='listener.html';return}if(s.audio_url)playDirect(s)}$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');$('expand').textContent=yes?'Klein ⌄':'Groß ⌃'};$('close').onclick=()=>{stopDirect();$('player').hidden=true};render();Promise.all([request('psms_artist_songs?select=id,title,audio_url,cover_url,album_title,owner_id,psms_artists(artist_name)&hidden=eq.false&audio_url=not.is.null&order=created_at.desc'),request('psms_artists?select=user_id,artist_name,logo_url,banner_url,bio&order=created_at.desc')]).then(([artists,profiles])=>{artistProfiles=profiles||[];db={albums:[],singles:artists.map(t=>({key:t.id,title:t.title,artist:t.psms_artists?.artist_name||'Künstler',audio_url:t.audio_url,cover_url:t.cover_url,album_title:t.album_title}))};catalogReady=true;render();if(verifiedListener){restoreListenerView();loadEditorialSpotlight()}}).catch(err=>{console.error(err);document.getElementById('songs').innerHTML='<div class="empty">Supabase noch nicht erreichbar. Bitte später neu laden.</div>'});
+function play(s){if(!verifiedListener){location.href='listener.html';return}if(s.audio_url)playDirect(s)}$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');$('expand').textContent=yes?'Klein ⌄':'Groß ⌃'};$('close').onclick=()=>{stopDirect();$('player').hidden=true};render();
+let psmsCatalogFingerprint='',psmsCatalogLoading=false;
+async function psmsSyncCatalog(initial=false){
+ if(psmsCatalogLoading||document.hidden&&!initial)return;psmsCatalogLoading=true;
+ try{
+ const [artists,profiles]=await Promise.all([
+ request('psms_artist_songs?select=id,title,audio_url,cover_url,album_title,owner_id,psms_artists(artist_name)&hidden=eq.false&audio_url=not.is.null&order=created_at.desc'),
+ request('psms_artists?select=user_id,artist_name,logo_url,banner_url,bio&order=created_at.desc')
+ ]);
+ const fingerprint=JSON.stringify([artists,profiles]);
+ if(initial||fingerprint!==psmsCatalogFingerprint){
+ psmsCatalogFingerprint=fingerprint;artistProfiles=profiles||[];
+ db={albums:[],singles:(artists||[]).map(t=>({key:t.id,title:t.title,artist:t.psms_artists?.artist_name||'Künstler',audio_url:t.audio_url,cover_url:t.cover_url,album_title:t.album_title}))};
+ catalogReady=true;render();
+ if(verifiedListener){const stored=JSON.parse(sessionStorage.getItem(psViewKey)||'null');if(initial)restoreListenerView();else if(stored?.view==='album'&&stored.id&&db.albums.some(a=>a.key===stored.id)){const y=window.scrollY;showAlbum(stored.id);window.scrollTo(0,y)}loadEditorialSpotlight()}
+ }
+ }catch(err){console.warn('Musikkatalog-Synchronisierung:',err);if(initial&&!catalogReady)$('songs').textContent='Musikbibliothek vorübergehend nicht erreichbar.'}
+ finally{psmsCatalogLoading=false}
+}
+psmsSyncCatalog(true);
+setInterval(()=>psmsSyncCatalog(),20000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)psmsSyncCatalog()});
+window.addEventListener('pageshow',()=>psmsSyncCatalog());
+
 let verifiedListener=null;let streamSequence=0;let streamReported=false;let streamPending=false;let streamSongId=null;let listenedSeconds=0;let lastPlayhead=null;
 const audio=$('ps-audio');let directSong=null;let repeatOne=false;let currentQueue=[];let playlists=[];let shuffle=false;audio.volume=.8;
 function stopDirect(){++streamSequence;audio.pause();audio.removeAttribute('src');audio.load();directSong=null}

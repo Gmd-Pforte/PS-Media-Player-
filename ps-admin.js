@@ -17,7 +17,12 @@ const detailsRoot=()=>document.getElementById('artist-inspector');
 const safeAsset=url=>{try{const u=new URL(url);return u.protocol==='https:'?u.href:null}catch{return null}};
 function node(tag,text,cls){const el=document.createElement(tag);if(text!==undefined&&text!==null)el.textContent=String(text);if(cls)el.className=cls;return el}
 function picture(url,cls){const src=safeAsset(url);if(!src)return node('div','♫','adm-empty-art');const im=document.createElement('img');im.src=src;im.alt='Künstlerbild';im.className=cls;im.loading='lazy';return im}
+const artistModal=$('ps-artist-details-modal');function closeArtistDetails(){artistModal.classList.add('hidden');document.body.classList.remove('ps-artist-modal-open');}
+$('ps-close-artist-details').onclick=closeArtistDetails;
+artistModal.addEventListener('click',e=>{if(e.target===artistModal)closeArtistDetails()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!artistModal.classList.contains('hidden'))closeArtistDetails()});
 async function inspectArtist(id){
+artistModal.classList.remove('hidden');document.body.classList.add('ps-artist-modal-open');
 const root=detailsRoot();root.replaceChildren(node('p','Künstlerdaten werden geladen …'));
 try{
  const d=await invoke('artist_details',{id});const a=d.artist;if(!a)throw Error('Künstler nicht gefunden');

@@ -56,10 +56,39 @@ $('upload-banner').onclick=()=>uploadImage('banner').catch(e=>status(e.message))
 
 async function loadArtistStreams(){const summary=document.getElementById('stream-summary'),box=document.getElementById('stream-song-stats');if(!summary||!userId)return;try{await ensureSession();const r=await fetch(API+'/rest/v1/rpc/psms_my_stream_stats',{method:'POST',headers:authHeads(),body:'{}'});if(!r.ok)throw Error('Streamdaten konnten nicht geladen werden');const data=await r.json();const tracks=await request('psms_artist_songs?select=id,title&owner_id=eq.'+userId);const counts=new Map(data.map(x=>[x.song_id,Number(x.stream_count)||0]));const total=tracks.reduce((n,t)=>n+(counts.get(t.id)||0),0);summary.textContent=total.toLocaleString('de-DE')+' erfasste Streams gesamt';box.replaceChildren();for(const t of tracks){const row=document.createElement('div');row.className='item';const title=document.createElement('strong');title.textContent=t.title;const count=document.createElement('span');count.textContent=(counts.get(t.id)||0).toLocaleString('de-DE')+' Streams';row.append(title,count);box.append(row)}}catch(e){summary.textContent=e.message}}
 
-const artistViewTitles={overview:'Übersicht',profile:'Künstlerprofil',releases:'Veröffentlichungen',upload:'Single veröffentlichen',album:'Album / EP erstellen',streams:'Meine Streams',support:'Support',account:'Einstellungen'};
+const artistReactionTypes=[['heart','❤️'],['fire','🔥'],['moved','🥹'],['applause','👏'],['headphones','🎧']];
+async function loadArtistReactions(){
+ const summary=$('artist-reaction-summary'),totals=$('artist-reaction-totals'),box=$('artist-reaction-tracks');
+ if(!userId||!summary)return;
+ summary.textContent='Reaktionen werden geladen …';totals.replaceChildren();box.replaceChildren();
+ try{
+  const tracks=await request('psms_artist_songs?select=id,title&owner_id=eq.'+encodeURIComponent(userId)+'&order=created_at.desc');
+  const counts=new Map(tracks.map(t=>[t.id,Object.fromEntries(artistReactionTypes.map(([k])=>[k,0]))]));
+  if(tracks.length){
+   for(let offset=0;offset<tracks.length;offset+=40){
+    const ids=tracks.slice(offset,offset+40).map(t=>t.id);
+    const votes=await request('psms_song_reactions?select=song_id,reaction&song_id=in.('+ids.join(',')+')');
+    for(const v of votes){const item=counts.get(v.song_id);if(item&&Object.prototype.hasOwnProperty.call(item,v.reaction))item[v.reaction]++}
+   }
+  }
+  const total=Object.fromEntries(artistReactionTypes.map(([k])=>[k,0]));
+  for(const values of counts.values())for(const [key] of artistReactionTypes)total[key]+=values[key];
+  const totalCount=Object.values(total).reduce((a,b)=>a+b,0);
+  summary.textContent=totalCount.toLocaleString('de-DE')+' Reaktionen auf '+tracks.length+' Songs';
+  for(const [key,emoji] of artistReactionTypes){const tile=document.createElement('div');tile.className='ps-reaction-total';const n=document.createElement('strong');n.textContent=emoji+' '+total[key].toLocaleString('de-DE');tile.append(n);totals.append(tile)}
+  if(!tracks.length){box.textContent='Noch keine veröffentlichten Songs.';return}
+  for(const track of tracks){
+   const row=document.createElement('div');row.className='item';const title=document.createElement('strong');title.textContent=track.title;
+   const stat=document.createElement('span');stat.className='ps-reaction-breakdown';stat.textContent=artistReactionTypes.map(([key,emoji])=>emoji+' '+counts.get(track.id)[key]).join('  ·  ');
+   row.append(title,stat);box.append(row);
+  }
+ }catch(e){summary.textContent='Reaktionen konnten nicht geladen werden: '+e.message}
+}
+$('refresh-artist-reactions').onclick=loadArtistReactions;
+const artistViewTitles={overview:'Übersicht',profile:'Künstlerprofil',releases:'Veröffentlichungen',upload:'Single veröffentlichen',album:'Album / EP erstellen',streams:'Meine Streams',reactions:'Reaktionen',support:'Support',account:'Einstellungen'};
 function switchArtistView(which){if(!artistViewTitles[which])return;sessionStorage.setItem('psms_artist_view',which);if(!artistProfileReady){showArtistOnboarding();return}
 $('artist-onboarding').classList.add('hidden');$('artist-dashboard-views').classList.remove('hidden');
-document.querySelectorAll('[data-studio-panel]').forEach(el=>el.classList.toggle('hidden',el.dataset.studioPanel!==which));document.querySelectorAll('.ps-studio-nav [data-studio-view]').forEach(b=>b.classList.toggle('active',b.dataset.studioView===which));$('studio-heading').textContent=artistViewTitles[which];if(which==='streams')loadArtistStreams();if(which==='support')loadArtistTickets();if(which==='releases')list();if(which==='overview')$('studio-welcome-name').textContent=$('artistname').value||'Deine Musik. Dein Bereich.';window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('[data-studio-panel]').forEach(el=>el.classList.toggle('hidden',el.dataset.studioPanel!==which));document.querySelectorAll('.ps-studio-nav [data-studio-view]').forEach(b=>b.classList.toggle('active',b.dataset.studioView===which));$('studio-heading').textContent=artistViewTitles[which];if(which==='streams')loadArtistStreams();if(which==='reactions')loadArtistReactions();if(which==='support')loadArtistTickets();if(which==='releases')list();if(which==='overview')$('studio-welcome-name').textContent=$('artistname').value||'Deine Musik. Dein Bereich.';window.scrollTo({top:0,behavior:'smooth'})}
 function showArtistOnboarding(){$('artist-onboarding').classList.remove('hidden');$('artist-dashboard-views').classList.add('hidden');$('studio-heading').textContent='Künstler einrichten';$('setup-artist-name').value=$('artistname').value||''}
 document.querySelectorAll('[data-studio-view]').forEach(button=>button.addEventListener('click',()=>switchArtistView(button.dataset.studioView)));
 $('setup-artist-submit').onclick=async()=>{const value=$('setup-artist-name').value.trim();if(value.length<2)return status('Bitte gib einen Künstlernamen mit mindestens 2 Zeichen ein.');$('artistname').value=value;await saveArtistProfile();if(artistProfileReady){switchArtistView('profile');status('Künstlername gespeichert! Jetzt kannst du Logo, Banner und Beschreibung ergänzen.')}};

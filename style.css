@@ -383,3 +383,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .ps-studio-release-list .item[hidden]{display:none!important}
 .ps-release-cover{height:80px;width:80px;flex:0 0 80px;border-radius:7px;background:#1f2526;display:grid;place-items:center;font-size:27px;overflow:hidden}
 .ps-release-cover img{width:100%;height:100%;object-fit:cover}
+
+/* Hörerbereich: seitliche Navigation und unaufdringlicher Dauerplayer */
+.ps-header-search{flex:1;min-width:180px;max-width:520px}
+.ps-header-search #q{width:100%;min-height:45px;margin:0!important;border-radius:9px;background:#192021;color:#f3f8f6;border:1px solid #34403e;padding:10px 16px}
+.player{max-width:none;left:0;right:0;bottom:0;margin:0;border:1px solid #31403e;border-radius:0;background:#121819;box-shadow:0 -8px 25px #0005;padding:12px 20px;z-index:30}
+.player .phead{min-height:54px}
+.ps-main-nav{gap:10px}
+.ps-main-nav button,.ps-main-nav a{white-space:nowrap}
+@media(min-width:1050px){
+ body:has(.ps-main-nav) .wrap{max-width:none;margin-left:230px;padding:18px 30px 240px}
+ body:has(.ps-main-nav) .top{min-height:70px;border-bottom:1px solid #26302f;padding:0 0 15px;margin-bottom:20px}
+ .ps-main-nav{position:fixed;top:90px;bottom:86px;left:0;width:220px;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:16px 12px;background:#101516;border-right:1px solid #2d3938;z-index:5}
+ .ps-main-nav .btn{width:100%;text-align:left;justify-content:flex-start}
+ .ps-main-nav [hidden]{display:none!important}
+}
+@media(max-width:1049px){.top{flex-wrap:wrap}.ps-header-search{order:3;max-width:none;width:100%;flex-basis:100%}.ps-main-nav{flex-wrap:wrap}}
+@media(max-width:600px){.player{padding:8px 12px}.phead{flex-wrap:wrap}.player .ps-controls{flex-wrap:wrap}.ps-header-search{min-width:0}}

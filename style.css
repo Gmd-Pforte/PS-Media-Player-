@@ -301,3 +301,8 @@ body:has(.ps-studio-shell){background:#080b14}
  #studio img{max-width:100%;height:auto}
 }
 @media(max-width:420px){#studio .ps-studio-quick{grid-template-columns:1fr}}
+
+/* Künstlerstudio-Rückkehr nur für authentifizierte Künstler */
+#ps-back-to-artist[hidden]{display:none!important}
+#ps-back-to-artist{background:linear-gradient(110deg,#6846be,#227d83);color:#fff;border:1px solid #c5b2ff;box-shadow:0 0 18px #744cc04b}
+@media(max-width:650px){#ps-back-to-artist{width:100%;justify-content:center;order:-1;font-size:15px;padding:12px}}

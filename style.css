@@ -370,3 +370,16 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .ps-song-row button:focus-visible{outline-offset:4px}
 @media(max-width:760px){.ps-studio-publish{justify-content:stretch}.ps-studio-publish .btn{width:100%}.ps-studio-top-tools{margin-left:auto}.ps-queue-panel{max-height:210px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+.ps-overview-release-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ps-overview-tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr));gap:16px;margin-top:15px}
+.ps-overview-release-card{display:flex;flex-direction:column;gap:7px;align-items:stretch;text-align:left;padding:0;background:none;color:#f1f6f4;border:0;cursor:pointer;min-width:0}
+.ps-overview-release-card strong{font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.ps-overview-release-card small{color:#aebcba}
+.ps-overview-release-art{display:grid;place-items:center;aspect-ratio:1/1;background:#1d2525;border-radius:8px;overflow:hidden;font-size:36px;color:#8baca5}
+.ps-overview-release-art img{width:100%;height:100%;object-fit:cover}
+.ps-release-filters{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0}
+.ps-release-filters [aria-pressed=true]{background:#1f4038!important;border-color:#77dcc5!important;color:#b5ffe9!important}
+.ps-studio-release-list .item[hidden]{display:none!important}
+.ps-release-cover{height:80px;width:80px;flex:0 0 80px;border-radius:7px;background:#1f2526;display:grid;place-items:center;font-size:27px;overflow:hidden}
+.ps-release-cover img{width:100%;height:100%;object-fit:cover}

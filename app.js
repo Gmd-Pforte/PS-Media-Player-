@@ -73,7 +73,7 @@ audio.onended=()=>{if(!repeatOne)adjacent(1)};
 audio.onerror=()=>{$('ps-audio-status').textContent='Audiodatei konnte nicht geladen werden.'};
 $('ps-seek').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};
 
-const psReactions=[['heart','❤️','Herz'],['fire','🔥','Mega'],['moved','🥹','Berührt'],['applause','👏','Respekt'],['headphones','🎧','Favorit']];
+const psReactions=[['heart','❤️','Gefällt mir'],['fire','🔥','Stark']];
 let reactionCurrentSong=null,reactionMyId=null,reactionBusy=false;
 function reactionStatus(message){const el=$('ps-reaction-status');if(el)el.textContent=message}
 async function reactionSession(){

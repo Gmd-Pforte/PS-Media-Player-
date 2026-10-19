@@ -341,3 +341,32 @@ body.ps-artist-modal-open{overflow:hidden}
 .ps-release-reactions{display:inline-flex;gap:8px;padding:6px 10px;border:1px solid rgba(255,255,255,.13);border-radius:99px;font-weight:600;white-space:nowrap}
 .ps-album-auto-type{padding:12px;border-radius:12px;border:1px solid rgba(140,122,220,.35);background:rgba(112,91,192,.13);font-weight:600}
 @media(max-width:690px){.ps-studio-top-tools{margin-left:auto}.ps-studio-top{flex-wrap:wrap;gap:12px}.ps-studio-top-tools button{width:48px}}
+
+/* PS MUSIC STREAM 2026 – ruhiges Streaming-Design */
+:root{color-scheme:dark;--bg:#0b0e10;--card:#15191b;--line:#293134;--muted:#a7b0b0;--accent:#6edec6}
+body{background:#0b0e10;color:#f4f7f6}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #73dfc5!important;outline-offset:3px}
+.btn{border-radius:10px}
+.btn:not(.secondary):not(.danger){background:#69dac0;color:#071412;border:1px solid #69dac0;box-shadow:none}
+.btn.secondary,.ps-studio-nav button,.ps-studio-tile{background:#1b2122;color:#edf5f2;border:1px solid #2e3838;box-shadow:none}
+.btn:hover,.ps-studio-nav button:hover{filter:brightness(1.1)}
+.ps-studio-nav button.active{background:#203631!important;border-left:3px solid #6edec6!important;color:#88eed7!important}
+.ps-studio-side,.adm-sidebar{background:#101416!important;border-right:1px solid #283032!important}
+.ps-studio-main,.adm-main{background:#0c1011!important}
+.ps-studio-card,.adm-card,.ps-studio-welcome,.ps-support-card,.panel{background:#161b1d!important;border:1px solid #283031!important;box-shadow:none!important}
+.ps-studio-top{background:#0c1011!important}
+.ps-studio-top-tools button{background:#171e1e!important;border-color:#31403e!important;color:#85e6d0!important}
+.ps-studio-publish{display:flex;justify-content:flex-end;margin:12px 0 24px}
+.ps-studio-publish .btn{min-height:48px;font-weight:700;font-size:15px}
+.ps-publish-choices{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px}
+.ps-publish-choices .btn{flex:1 1 220px;min-height:60px}
+.ps-reactions-in-stats{margin-top:20px}
+.ps-reactions-in-stats .ps-studio-card{background:#151b1c!important}
+.ps-queue-panel{padding:15px;margin-top:10px;background:#161d1e;border:1px solid #344242;border-radius:12px;max-height:280px;overflow-y:auto}
+.ps-queue-entry{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #293435;padding:12px;background:transparent;color:#f0f5f3;cursor:pointer}
+.ps-queue-entry.active{color:#6edec6}
+.ps-controls button,#ps-mute{min-width:44px;min-height:44px;cursor:pointer}
+#ps-volume{accent-color:#6edec6}
+.ps-song-row button:focus-visible{outline-offset:4px}
+@media(max-width:760px){.ps-studio-publish{justify-content:stretch}.ps-studio-publish .btn{width:100%}.ps-studio-top-tools{margin-left:auto}.ps-queue-panel{max-height:210px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}

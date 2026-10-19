@@ -268,3 +268,12 @@ body:has(.ps-studio-shell){background:#080b14}
 .ps-reaction-total{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 15px;background:rgba(255,255,255,.045);min-width:90px;text-align:center}
 .ps-reaction-total strong{font-size:1.1rem}
 .ps-reaction-breakdown{display:block;font-size:.86rem;line-height:1.9;overflow-wrap:anywhere}
+
+/* Klare Registrierung und Anmeldung im Künstlerstudio */
+.ps-auth-panel{max-width:620px;margin:0 auto 28px}
+.ps-auth-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 24px}
+.ps-auth-choice .btn{white-space:normal;min-height:52px;line-height:1.35}
+.ps-auth-choice .ps-auth-active{background:linear-gradient(110deg,#6648bb,#30a7a0)!important;color:white!important;border-color:transparent!important}
+.ps-auth-panel label{display:block;margin-top:14px}
+.ps-auth-panel>.actions{margin-top:18px}
+@media(max-width:510px){.ps-auth-choice{grid-template-columns:1fr}}

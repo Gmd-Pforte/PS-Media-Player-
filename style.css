@@ -312,3 +312,10 @@ body:has(.ps-studio-shell){background:#080b14}
 .ps-release-edit input{flex:1 1 180px;min-width:0;box-sizing:border-box}
 .ps-release-edit [role=status]{width:100%;font-size:.85rem}
 @media(max-width:650px){.ps-release-edit input,.ps-release-edit button{flex:1 1 100%}}
+
+.ps-crop-overlay{position:fixed;z-index:99999;inset:0;background:rgba(3,5,14,.94);display:flex;align-items:center;justify-content:center;padding:12px;overflow-y:auto}
+.ps-crop-dialog{width:min(100%,650px);max-height:95dvh;overflow-y:auto;padding:18px;border:1px solid #8b77d3;border-radius:20px;background:#17192b;color:#fff;box-sizing:border-box;box-shadow:0 20px 80px #000b}
+.ps-crop-dialog h2{margin:0 0 7px}.ps-crop-dialog p{font-size:14px;color:#c9d0df}
+.ps-crop-canvas{display:block;width:100%;height:auto;max-height:55dvh;object-fit:contain;background:#090b13;border-radius:10px;touch-action:none;cursor:grab}
+.ps-crop-dialog input[type=range]{width:100%;margin:12px 0;accent-color:#8e6cf5}
+.ps-crop-dialog .actions{display:flex;gap:10px;flex-wrap:wrap}.ps-crop-dialog .actions button{flex:1 1 170px;min-height:46px}

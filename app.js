@@ -51,7 +51,7 @@ async function playDirect(song){
  $('ptitle').textContent=song.title;$('partist').textContent=song.artist||'Künstler';
  const artwork=song.cover_url||artistProfiles.find(a=>a.artist_name===song.artist)?.logo_url||song.cover;
  $('pcover').innerHTML=cover(artwork);$('ps-cover-large').innerHTML=cover(artwork);$('ps-title-large').textContent=song.title;$('ps-artist-large').textContent=song.artist||'Künstler';$('player').style.setProperty('--song-cover',safeImg(artwork)?'url("'+safeImg(artwork)+'")':'none');
- directSong=song;streamSongId=song.key;streamReported=false;streamPending=false;listenedSeconds=0;lastPlayhead=null;const thisSequence=++streamSequence;const url=await secureAudioUrl(song.audio_url).catch(e=>{$('ps-audio-status').textContent=e.message;return null});if(!url||thisSequence!==streamSequence)return;audio.src=url;audio.load();
+ directSong=song;refreshReactions(song.key);streamSongId=song.key;streamReported=false;streamPending=false;listenedSeconds=0;lastPlayhead=null;const thisSequence=++streamSequence;const url=await secureAudioUrl(song.audio_url).catch(e=>{$('ps-audio-status').textContent=e.message;return null});if(!url||thisSequence!==streamSequence)return;audio.src=url;audio.load();
  $('ps-audio-status').textContent='';
  audio.play().catch(()=>{$('ps-audio-status').textContent='Zum Starten bitte ▶ tippen.'});
  // Größe des Players beim Songwechsel beibehalten.
@@ -73,6 +73,51 @@ audio.onended=()=>{if(!repeatOne)adjacent(1)};
 audio.onerror=()=>{$('ps-audio-status').textContent='Audiodatei konnte nicht geladen werden.'};
 $('ps-seek').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};
 
+const psReactions=[['heart','❤️','Herz'],['fire','🔥','Mega'],['moved','🥹','Berührt'],['applause','👏','Respekt'],['headphones','🎧','Favorit']];
+let reactionCurrentSong=null,reactionMyId=null,reactionBusy=false;
+function reactionStatus(message){const el=$('ps-reaction-status');if(el)el.textContent=message}
+async function reactionSession(){
+const ss=await validListenerSession();
+if(!ss?.access_token)throw Error('Bitte zuerst als Hörer anmelden.');
+if(!reactionMyId){
+ const r=await fetch(API+'/auth/v1/user',{headers:{apikey:ANON,Authorization:'Bearer '+ss.access_token}});
+ if(!r.ok)throw Error('Bitte melde dich erneut an.');
+ const u=await r.json();reactionMyId=u.id;
+}
+return ss;
+}
+async function reactionApi(path,options={}){
+ const ss=await reactionSession();
+ const r=await fetch(API+'/rest/v1/'+path,{...options,headers:{apikey:ANON,Authorization:'Bearer '+ss.access_token,'Content-Type':'application/json',...options.headers}});
+ if(!r.ok)throw Error('Reaktion konnte nicht gespeichert werden.');
+ const result=await r.text();return result?JSON.parse(result):null;
+}
+async function refreshReactions(songId){
+ reactionCurrentSong=songId;reactionStatus('Reaktionen werden geladen …');
+ try{
+  const records=await reactionApi('psms_song_reactions?select=user_id,reaction&song_id=eq.'+encodeURIComponent(songId));
+  if(reactionCurrentSong!==songId)return;
+  const counts=Object.fromEntries(psReactions.map(r=>[r[0],0]));
+  for(const vote of records||[])if(Object.hasOwn(counts,vote.reaction))counts[vote.reaction]++;
+  const mine=(records||[]).find(v=>v.user_id===reactionMyId)?.reaction||'';
+  const root=$('ps-reaction-buttons');root.replaceChildren();
+  for(const [key,emoji,label] of psReactions){
+   const btn=document.createElement('button');btn.type='button';btn.className='btn secondary small ps-reaction-btn'+(mine===key?' selected':'');
+   btn.textContent=emoji+' '+counts[key];btn.title=label;btn.setAttribute('aria-label',label+': '+counts[key]);btn.setAttribute('aria-pressed',String(mine===key));
+   btn.onclick=()=>setSongReaction(songId,mine===key?null:key);root.append(btn);
+  }
+  reactionStatus(mine?'Deine Reaktion ist gespeichert. Nochmals tippen zum Entfernen.':'Tippe auf eine Reaktion.');
+ }catch(e){if(reactionCurrentSong===songId)reactionStatus(e.message)}
+}
+async function setSongReaction(songId,reaction){
+ if(reactionBusy)return;reactionBusy=true;reactionStatus('Wird gespeichert …');
+ for(const b of $('ps-reaction-buttons').querySelectorAll('button'))b.disabled=true;
+ try{
+  if(reaction===null){await reactionApi('psms_song_reactions?song_id=eq.'+encodeURIComponent(songId)+'&user_id=eq.'+encodeURIComponent(reactionMyId),{method:'DELETE'});}
+  else{await reactionApi('psms_song_reactions?on_conflict=song_id,user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({song_id:songId,user_id:reactionMyId,reaction})});}
+  await refreshReactions(songId);
+ }catch(e){reactionStatus(e.message)}finally{reactionBusy=false;for(const b of $('ps-reaction-buttons').querySelectorAll('button'))b.disabled=false}
+}
 function listenerSession(){try{return JSON.parse(localStorage.getItem('psms_listener_session')||'null')}catch{return null}}
 async function validListenerSession(){let ss=listenerSession();if(!ss?.access_token)return null;const exp=ss.expires_at||((ss.expires_in&&ss.issued_at)?ss.issued_at+ss.expires_in:0);if(exp&&exp>Date.now()/1000+60)return ss;if(!ss.refresh_token)return ss;const r=await fetch(API+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:HEAD,body:JSON.stringify({refresh_token:ss.refresh_token})});if(!r.ok)throw Error('Deine Anmeldung ist abgelaufen. Bitte erneut anmelden.');const next=await r.json();ss={...ss,...next,expires_at:Math.floor(Date.now()/1000)+(next.expires_in||3600)};localStorage.setItem('psms_listener_session',JSON.stringify(ss));return ss}
 async function listenerRequest(path,options={}){const ss=await validListenerSession();if(!ss?.access_token)throw Error('Bitte zuerst als Hörer anmelden.');const r=await fetch(API+'/rest/v1/'+path,{...options,headers:{apikey:ANON,Authorization:'Bearer '+ss.access_token,'Content-Type':'application/json',...options.headers}});if(!r.ok)throw Error('Playlist konnte nicht gespeichert werden: '+(await r.text()).slice(0,180));const body=await r.text();if(!body.trim())return null;try{return JSON.parse(body)}catch{throw Error('Ungültige Antwort vom Playlist-Server. Bitte erneut versuchen.')}}

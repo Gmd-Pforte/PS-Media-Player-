@@ -319,3 +319,18 @@ body:has(.ps-studio-shell){background:#080b14}
 .ps-crop-canvas{display:block;width:100%;height:auto;max-height:55dvh;object-fit:contain;background:#090b13;border-radius:10px;touch-action:none;cursor:grab}
 .ps-crop-dialog input[type=range]{width:100%;margin:12px 0;accent-color:#8e6cf5}
 .ps-crop-dialog .actions{display:flex;gap:10px;flex-wrap:wrap}.ps-crop-dialog .actions button{flex:1 1 170px;min-height:46px}
+
+/* Große Künstler-Detailansicht statt beengter Seitenleiste */
+.ps-artist-detail-overlay.hidden{display:none!important}
+.ps-artist-detail-overlay{position:fixed;inset:0;z-index:100000;background:rgba(3,5,11,.88);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+body.ps-artist-modal-open{overflow:hidden}
+.ps-artist-detail-window{width:min(1140px,100%);height:min(92dvh,950px);background:linear-gradient(150deg,#16182a,#0d1721);border:1px solid #7367b2;border-radius:20px;box-shadow:0 30px 90px #000b;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ps-artist-detail-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid #4e5375;flex-shrink:0}
+.ps-artist-detail-top h2{margin:0;font-size:22px}
+.ps-artist-details-content{overflow:auto;flex:1;max-height:none!important;width:100%;box-sizing:border-box;padding:24px!important;background:transparent!important;border:0!important}
+.ps-artist-details-content .adm-inspector-banner{width:100%;max-height:330px;object-fit:cover}
+.ps-artist-details-content .adm-inspector-tabs{display:flex;flex-wrap:wrap;gap:9px}
+.ps-artist-details-content .adm-inspector-body{max-height:none!important;overflow:visible!important}
+.adm-artist-full-list{width:100%;max-height:none;overflow:visible;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:12px}
+.adm-artist-full-list .item{min-width:0}
+@media(max-width:650px){.ps-artist-detail-overlay{padding:0}.ps-artist-detail-window{width:100%;height:100dvh;border:0;border-radius:0}.ps-artist-detail-top{padding:12px 14px}.ps-artist-detail-top h2{font-size:18px}.ps-artist-details-content{padding:14px!important}.ps-artist-details-content .adm-inspector-banner{max-height:220px}.ps-artist-detail-top .btn{min-height:44px}}

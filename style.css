@@ -400,3 +400,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 }
 @media(max-width:1049px){.top{flex-wrap:wrap}.ps-header-search{order:3;max-width:none;width:100%;flex-basis:100%}.ps-main-nav{flex-wrap:wrap}}
 @media(max-width:600px){.player{padding:8px 12px}.phead{flex-wrap:wrap}.player .ps-controls{flex-wrap:wrap}.ps-header-search{min-width:0}}
+
+/* Letzte Designangleichung: Cover statt Glow */
+.hero{background:#17201f!important;border:1px solid #2f3c39!important;box-shadow:none!important}
+.hero-orb{background:#1b302a!important;box-shadow:none!important;color:#79e2c9!important}
+.ps-section-heading,.ps-featured,.ps-playlist-page,.ps-studio-card{box-shadow:none!important}
+.ps-head-accent,.ps-section-kicker,.eyebrow{color:#71d9c3!important;text-shadow:none!important}
+.ps-editorial-slide,.tile,.artist-card,.ps-pl-card,.ps-featured-card{background:#181f20!important;border-color:#2c3836!important;box-shadow:none!important}
+.ps-site-footer{border-color:#2a3433!important;background:#101718!important}
+.player .phead .info strong{color:#f2f7f4}
+.ps-reaction-btn.selected{border-color:#77e2c8!important;background:#25433a!important}

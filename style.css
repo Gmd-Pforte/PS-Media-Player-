@@ -306,3 +306,9 @@ body:has(.ps-studio-shell){background:#080b14}
 #ps-back-to-artist[hidden]{display:none!important}
 #ps-back-to-artist{background:linear-gradient(110deg,#6846be,#227d83);color:#fff;border:1px solid #c5b2ff;box-shadow:0 0 18px #744cc04b}
 @media(max-width:650px){#ps-back-to-artist{width:100%;justify-content:center;order:-1;font-size:15px;padding:12px}}
+
+/* Songverwaltung / mobile Bearbeitung */
+.ps-release-edit{display:flex;flex-wrap:wrap;gap:8px;width:100%;padding:12px 0;border-top:1px solid rgba(255,255,255,.12);margin-top:9px}
+.ps-release-edit input{flex:1 1 180px;min-width:0;box-sizing:border-box}
+.ps-release-edit [role=status]{width:100%;font-size:.85rem}
+@media(max-width:650px){.ps-release-edit input,.ps-release-edit button{flex:1 1 100%}}

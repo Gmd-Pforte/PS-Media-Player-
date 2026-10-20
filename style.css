@@ -824,3 +824,8 @@ body.ps-liquid-live img,body.ps-liquid-live video,body.ps-liquid-live canvas:not
 #ps-mini-progress:focus-visible{outline:2px solid var(--ps-liquid-accent,#b39aff);outline-offset:4px}
 #ps-mini-progress-fill{pointer-events:none}
 #ps-seek{cursor:pointer;touch-action:pan-x}
+
+/* Visible seek track — override legacy hidden mini progress */
+.player:not(.expanded) #ps-mini-progress{display:block!important;position:relative!important;inset:auto!important;width:100%!important;height:14px!important;min-height:14px!important;background:linear-gradient(to bottom,transparent 5px,#34433e 5px,#34433e 9px,transparent 9px)!important;touch-action:none!important;cursor:pointer!important;z-index:4!important}
+.player:not(.expanded) #ps-mini-progress-fill{height:4px!important;position:absolute!important;top:5px!important;left:0!important;background:var(--ps-liquid-accent,#76e7be)!important;border-radius:999px!important;box-shadow:0 0 9px rgba(118,231,190,.55)!important}
+.player.expanded #ps-mini-progress{display:none!important}

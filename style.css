@@ -818,3 +818,9 @@ body.ps-liquid-live .ps-help-trigger{background:var(--ps-liquid-accent);border-c
 body.ps-liquid-live img,body.ps-liquid-live video,body.ps-liquid-live canvas:not(#ps-liquid-canvas){opacity:1;filter:none}
 @media(prefers-reduced-motion:reduce){#ps-liquid-canvas{opacity:.38}}
 
+
+/* Player seek: click, touch and drag */
+#ps-mini-progress{touch-action:none;cursor:pointer;position:relative;min-height:12px;display:flex;align-items:center}
+#ps-mini-progress:focus-visible{outline:2px solid var(--ps-liquid-accent,#b39aff);outline-offset:4px}
+#ps-mini-progress-fill{pointer-events:none}
+#ps-seek{cursor:pointer;touch-action:pan-x}

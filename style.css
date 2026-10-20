@@ -775,3 +775,28 @@ body.ps-admin-user-open{overflow:hidden}
 .ps-user-event span{color:#9db4a7;font-size:12px}
 .ps-user-event p{grid-column:1/-1;color:#c1d1c6;margin:0}
 @media(max-width:650px){.ps-admin-user-overlay{padding:0}.ps-admin-user-dialog{width:100%;height:100dvh;max-height:none;border-radius:0;border:0}.ps-admin-user-dialog>header{padding:15px}.ps-admin-user-content{padding:15px}.ps-user-facts{grid-template-columns:1fr}.ps-user-event{grid-template-columns:1fr}}
+
+/* Gemeinsamer, zugangsgeschützter Supportchat */
+.ps-help-root{position:fixed;right:22px;bottom:105px;z-index:10010;font-family:inherit}
+.ps-help-trigger{height:58px;width:58px;border-radius:50%;background:#63deb6;border:1px solid #a4ffe0;box-shadow:0 9px 35px #0009;color:#08231b;font-size:26px;cursor:pointer}
+.ps-help-panel[hidden],.ps-help-reply[hidden],.ps-help-thread[hidden],.ps-help-new[hidden],#ps-recovery-form[hidden]{display:none!important}
+.ps-help-panel{position:absolute;bottom:70px;right:0;width:min(390px,calc(100vw - 30px));max-height:min(75dvh,670px);display:flex;flex-direction:column;border-radius:17px;background:#131e1b;color:#f5faf7;border:1px solid #3f6555;box-shadow:0 20px 70px #000c;overflow:hidden}
+.ps-help-panel>header{display:flex;align-items:center;justify-content:space-between;background:#1e342b;padding:15px 18px;border-bottom:1px solid #3d584b}
+.ps-help-panel>header button{background:transparent;border:0;color:#fff;font-size:20px;cursor:pointer}
+.ps-help-content{padding:17px;overflow-y:auto}
+.ps-help-info,.ps-help-user{color:#bed0c6;font-size:12px;line-height:1.5}
+.ps-help-new,.ps-help-reply{display:flex;flex-direction:column;gap:10px;margin-top:13px}
+.ps-help-new label,.ps-help-reply label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:#d0e4d7}
+.ps-help-panel input,.ps-help-panel textarea,.ps-recovery-help input{border:1px solid #496256;background:#0c1412;color:#f2faf5;padding:11px;border-radius:8px;width:100%;box-sizing:border-box}
+.ps-help-new button,.ps-help-reply button{border:0;border-radius:9px;min-height:42px;cursor:pointer;background:#74e5bf;color:#09271c;font-weight:750}
+.ps-help-ticket{display:block;width:100%;text-align:left;background:#202e28;color:#e8f6ed;padding:12px;border:1px solid #375347;border-radius:8px;margin:7px 0;cursor:pointer}
+.ps-help-thread{display:flex;flex-direction:column;gap:8px}
+.ps-help-message{padding:11px;border-radius:9px;background:#24372e;font-size:13px}
+.ps-help-message.mine{background:#245448}
+.ps-help-message p{white-space:pre-wrap;overflow-wrap:anywhere}
+.ps-help-message small{color:#adc3b6}
+.ps-help-status{font-size:12px;color:#a5edc9;min-height:20px}
+.ps-recovery-help{margin-top:16px;padding:14px;background:#17241f;border:1px solid #375348;border-radius:10px}
+.ps-recovery-help #ps-recovery-form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.ps-recovery-help p{font-size:13px;color:#b6c8bb}
+@media(max-width:630px){.ps-help-root{right:12px;bottom:85px}.ps-help-trigger{width:52px;height:52px}.ps-help-panel{bottom:62px;right:-5px;max-height:74dvh}}

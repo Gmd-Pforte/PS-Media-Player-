@@ -561,3 +561,51 @@ body:has(.ps-main-nav) .ps-main-nav .ps-studio-return{display:flex!important;ali
 body:has(.ps-main-nav) .ps-main-nav .ps-studio-return[hidden]{display:none!important}
 body:has(.ps-main-nav) .ps-main-nav .ps-studio-return:focus-visible{outline:2px solid #a8ffe0!important}
 @media(max-width:850px){body:has(.ps-main-nav) .ps-main-nav .ps-studio-return{flex:1 1 100%!important;justify-content:center!important;margin-top:4px!important}}
+
+/* Einheitliches Streaming- und Künstlerlayout – Version 6 */
+body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu[hidden],
+body:has(.ps-main-nav) .ps-main-nav #ps-open-overview[hidden]{display:none!important}
+body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu{display:flex!important;flex-direction:column!important;gap:4px!important;border-top:1px solid #33403b!important;padding-top:14px!important;margin-top:10px!important}
+body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu[hidden]{display:none!important}
+body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu span{font-size:10px!important;letter-spacing:.14em!important;font-weight:700!important;color:#82938c!important;padding:5px 12px!important}
+body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu button{min-height:43px!important;padding-left:22px!important;font-size:13px!important}
+.ps-dashboard-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;margin:12px 0 20px;flex-wrap:wrap}
+.ps-dashboard-heading h1{font-size:clamp(30px,3.8vw,43px);margin:0 0 4px;letter-spacing:-.035em}
+.ps-dashboard-heading p{color:#aab6b2;margin:0}
+.ps-dashboard-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:24px 0 36px}
+.ps-dashboard-metrics>div{display:flex;flex-direction:column;gap:7px;padding:8px 25px;border-right:1px solid #303935}
+.ps-dashboard-metrics>div:first-child{padding-left:0}
+.ps-dashboard-metrics>div:last-child{border:0}
+.ps-dashboard-metrics small{color:#a9b5b0;font-size:13px}
+.ps-dashboard-metrics strong{font-size:clamp(19px,2.5vw,31px);font-weight:750;color:#f4f8f5}
+.ps-dashboard-section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.ps-dashboard-section-title h2,.ps-dashboard-recent-title{font-size:22px;letter-spacing:-.02em;margin:0}
+.ps-dashboard-section-title button{color:#c2d0c9;background:transparent;border:0;min-height:42px;padding:8px 10px}
+.ps-dashboard-covers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.ps-dashboard-cover{padding:0;border:0;background:transparent;color:#f2f6f4;text-align:left;display:flex;flex-direction:column;gap:7px;min-width:0}
+.ps-dashboard-cover .ps-unified-cover{width:100%!important;height:auto!important;aspect-ratio:1/1;border-radius:5px}
+.ps-dashboard-cover .ps-unified-cover img{width:100%;height:100%;object-fit:cover}
+.ps-dashboard-cover strong{font-size:14px;overflow-wrap:anywhere}
+.ps-dashboard-cover small{color:#9ea9a4;font-size:12px}
+.ps-dashboard-recent-title{margin:30px 0 12px}
+.ps-dashboard-recent{background:#141819;border-radius:7px;overflow:hidden}
+.ps-dashboard-recent-row{display:grid;grid-template-columns:45px minmax(120px,1fr) 180px 120px;align-items:center;gap:14px;padding:9px 12px;border-bottom:1px solid #303937}
+.ps-dashboard-recent-row strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ps-dashboard-recent-row span,.ps-dashboard-recent-row small{color:#a3b0aa;font-size:12px}
+#ps-unified-overview{padding:14px 0 140px;min-width:0}
+@media(max-width:850px){
+ body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu{flex:1 1 100%!important;display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:wrap!important}
+ body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu[hidden]{display:none!important}
+ body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu span{width:100%}
+ body:has(.ps-main-nav) .ps-main-nav #ps-artist-submenu button{flex:1 1 auto!important;width:auto!important}
+}
+@media(max-width:640px){
+ .ps-dashboard-covers{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .ps-dashboard-metrics>div{padding:7px!important}
+ .ps-dashboard-metrics small{font-size:10px}
+ .ps-dashboard-metrics strong{font-size:18px}
+ .ps-dashboard-recent-row{grid-template-columns:40px minmax(0,1fr) 75px;gap:8px}
+ .ps-dashboard-recent-row span{display:none}
+ .ps-dashboard-recent-row small{font-size:10px}
+ .ps-dashboard-heading .btn{width:100%}
+}

@@ -546,3 +546,11 @@ body:has(.ps-main-nav) #ps-unified-stats{padding-top:24px!important}
  body:has(.ps-main-nav) .ps-main-nav button{width:auto!important;flex:1 1 auto!important;min-height:42px!important;white-space:nowrap!important;font-size:12px!important;padding:10px 12px!important;background:#192221!important;border:1px solid #34403d!important}
  body:has(.ps-main-nav) #listener-content{width:100%!important}
 }
+
+@media(min-width:851px){
+ body:has(.ps-main-nav) .wrap>.top{width:calc(100% + 294px)!important;margin-left:-270px!important;grid-template-columns:220px minmax(240px,1fr) auto!important;padding:12px 24px!important;position:relative!important}
+ body:has(.ps-main-nav) .wrap>.top .ps-header-search{max-width:520px!important}
+}
+@media(max-width:850px){
+ body:has(.ps-main-nav) .wrap>.top{margin-left:-14px!important;width:calc(100% + 28px)!important}
+}

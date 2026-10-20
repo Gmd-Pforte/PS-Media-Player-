@@ -517,3 +517,32 @@ body.ps-unified-modal{overflow:hidden}
 .ps-unified-profile-form img{max-width:100%;max-height:230px;object-fit:cover;border-radius:7px}
 .ps-unified-profile-form .ps-profile-actions{display:flex;gap:12px;flex-wrap:wrap}
 @media(max-width:849px){body:has(.ps-main-nav) .ps-main-nav{display:flex;flex-wrap:wrap;gap:6px!important;width:100%;position:static;background:#141a1a;padding:8px!important}body:has(.ps-main-nav) .ps-main-nav button{min-height:42px}body:has(.ps-main-nav) .wrap{max-width:100%;margin:0;padding:12px 14px 160px}.top{flex-wrap:wrap!important}.ps-header-search{order:3;flex:1 1 100%}}
+
+/* Layout-Reparatur 4: Navigation ist ein eigenes Element, niemals Kind der Kopfzeile. */
+body:has(.ps-main-nav){background:#0b0e10!important}
+body:has(.ps-main-nav) .top{display:grid!important;grid-template-columns:minmax(175px,220px) minmax(180px,1fr) auto!important;align-items:center!important;gap:18px!important;position:relative!important;top:auto!important;min-height:72px!important;height:auto!important;max-width:none!important;width:100%!important;margin:0!important;padding:12px 24px!important;border-bottom:1px solid #2c3533!important;background:#101516!important;border-radius:0!important}
+body:has(.ps-main-nav) .top>div:first-child{min-width:0!important}
+body:has(.ps-main-nav) .top .brand{font-size:18px!important;line-height:1.2!important;white-space:normal!important}
+body:has(.ps-main-nav) .top .tag{font-size:9px!important;line-height:1.4!important}
+body:has(.ps-main-nav) .ps-header-search{min-width:0!important;max-width:560px!important;order:unset!important;width:100%!important;margin:auto!important}
+body:has(.ps-main-nav) .ps-header-search input{width:100%!important;min-width:0!important}
+body:has(.ps-main-nav) #ps-global-tools{display:flex!important;position:static!important;justify-content:flex-end!important;align-items:center!important;gap:4px!important;min-width:136px!important}
+body:has(.ps-main-nav) #ps-global-tools button{width:44px!important;height:44px!important;flex-shrink:0!important}
+body:has(.ps-main-nav) .wrap{box-sizing:border-box!important;max-width:none!important;width:100%!important;margin:0!important;padding:0 24px 200px 270px!important}
+body:has(.ps-main-nav) .ps-main-nav{position:fixed!important;left:0!important;top:72px!important;bottom:0!important;width:244px!important;max-width:244px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;flex-wrap:nowrap!important;gap:5px!important;padding:18px 12px 120px!important;margin:0!important;background:#111516!important;border:0!important;border-right:1px solid #2c3533!important;border-radius:0!important;box-shadow:none!important;overflow-y:auto!important;z-index:15!important}
+body:has(.ps-main-nav) .ps-main-nav button{flex:none!important;display:block!important;width:100%!important;min-height:45px!important;text-align:left!important;background:transparent!important;border:0!important;border-radius:6px!important;box-shadow:none!important;color:#d0d9d6!important;font-size:14px!important;padding:12px!important}
+body:has(.ps-main-nav) .ps-main-nav button[hidden]{display:none!important}
+body:has(.ps-main-nav) .ps-main-nav button:hover{background:#253d34!important;color:#7be7c9!important}
+body:has(.ps-main-nav) #listener-content,#listener-gate{max-width:1500px!important;margin:0 auto!important}
+body:has(.ps-main-nav) #ps-unified-profile,
+body:has(.ps-main-nav) #ps-unified-music,
+body:has(.ps-main-nav) #ps-unified-stats{padding-top:24px!important}
+@media(max-width:850px){
+ body:has(.ps-main-nav) .top{grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important;padding:12px 14px!important}
+ body:has(.ps-main-nav) .top .ps-header-search{grid-row:2!important;grid-column:1 / -1!important;max-width:none!important}
+ body:has(.ps-main-nav) .top #ps-global-tools{grid-column:2!important;grid-row:1!important}
+ body:has(.ps-main-nav) .wrap{padding:0 14px 180px!important;margin:0!important;width:100%!important;max-width:none!important}
+ body:has(.ps-main-nav) .ps-main-nav{position:static!important;top:auto!important;bottom:auto!important;left:auto!important;width:100%!important;max-width:none!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:6px!important;overflow:visible!important;padding:10px 0!important;margin:0 0 14px!important;border:0!important;border-bottom:1px solid #2d3634!important;background:transparent!important}
+ body:has(.ps-main-nav) .ps-main-nav button{width:auto!important;flex:1 1 auto!important;min-height:42px!important;white-space:nowrap!important;font-size:12px!important;padding:10px 12px!important;background:#192221!important;border:1px solid #34403d!important}
+ body:has(.ps-main-nav) #listener-content{width:100%!important}
+}

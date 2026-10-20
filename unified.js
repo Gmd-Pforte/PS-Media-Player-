@@ -17,11 +17,11 @@ el('ps-open-search').onclick=()=>{show('homeview');el('q').focus();el('q').scrol
 const menu=el('ps-global-menu');const menuClose=()=>menu.classList.add('hidden');
 el('ps-global-account').onclick=()=>menu.classList.toggle('hidden');
 el('ps-global-settings').onclick=()=>menu.classList.toggle('hidden');
-el('ps-global-help').onclick=()=>{menu.classList.remove('hidden');el('ps-menu-feedback').focus()};
+el('ps-global-help').onclick=()=>{menuClose();window.PSMSHelp?.open()};
 el('ps-menu-close').onclick=menuClose;
 el('ps-menu-listener').onclick=()=>{menuClose();showPlaylistLibrary()};
 el('ps-menu-artist').onclick=()=>{menuClose();show('ps-unified-profile')};
-el('ps-menu-feedback').onclick=()=>{menuClose();const msg='Feedback und Hilfe: Die bestehende Support-Unterhaltung wird derzeit noch in die gemeinsame Anwendung übernommen. Du kannst das Konto weiterhin über die vorhandene Supportoberfläche erreichen.';alert(msg)};
+el('ps-menu-feedback').onclick=()=>{menuClose();window.PSMSHelp?.open()};
 el('ps-menu-logout').onclick=async()=>{const ss=await validListenerSession();if(ss)await fetch(API+'/auth/v1/logout',{method:'POST',headers:{apikey:ANON,Authorization:'Bearer '+ss.access_token}}).catch(()=>{});['psms_listener_session','psms_artist_session','psms_public_session'].forEach(k=>localStorage.removeItem(k));location.replace('listener.html')};
 function image(url,size=52){const box=document.createElement('span');box.className='ps-unified-cover';box.style.width=size+'px';box.style.height=size+'px';if(url&&/^https:\/\//.test(url)){const im=document.createElement('img');im.src=url;im.alt='Cover';im.loading='lazy';box.append(im)}else box.textContent='♫';return box}
 function categorise(row,group){return !row.album_title?'single':'legacy-collection'}

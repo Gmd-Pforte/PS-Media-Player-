@@ -645,3 +645,41 @@ body:has(.ps-main-nav) #ps-unified-overview{max-width:1450px}
  .ps-dashboard-heading h1{font-size:28px}
  .ps-dashboard-recent-row{grid-template-columns:40px minmax(0,1fr) 80px!important}
 }
+
+/* PS MUSIC STREAM – Künstlerstatistiken */
+#ps-unified-stats{max-width:1480px}
+#ps-unified-stats>h1{font-size:clamp(32px,4vw,48px);font-weight:850;letter-spacing:-.045em;margin:10px 0 6px;color:#f8faf9}
+#ps-unified-stats>p{color:#a2b1ac}
+.ps-stats-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:27px 0}
+.ps-stats-metric{background:#171e1d;border:1px solid #2d3c37;border-radius:12px;padding:22px 19px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ps-stats-label{font-size:13px;color:#b4c4bc;font-weight:650}
+.ps-stats-number{font-size:clamp(26px,3vw,39px);font-weight:830;letter-spacing:-.035em;line-height:1.1;color:#f5faf7;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ps-stats-hint{font-size:11px;color:#8d9e95}
+.ps-stats-metric:first-child{border-color:#56816e}
+.ps-stats-metric:first-child .ps-stats-number{color:#91f0c9}
+.ps-stats-charts{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(235px,1fr);gap:18px;margin-bottom:18px}
+.ps-stats-panel{min-width:0;background:#151b1b;border:1px solid #293633;border-radius:12px;padding:22px}
+.ps-stats-panel h2{font-size:20px;letter-spacing:-.02em;margin:0 0 4px;color:#f6fbf9}
+.ps-stats-desc{font-size:12px;color:#95aaa1;margin:0 0 23px}
+.ps-stats-top{grid-row:span 2}
+.ps-stats-bar-row{margin-bottom:18px}
+.ps-stats-bar-heading{display:flex;justify-content:space-between;gap:20px;font-size:13px;margin-bottom:7px;line-height:1.4}
+.ps-stats-bar-heading span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dce9e3}
+.ps-stats-bar-heading strong{font-size:13px;color:#ecfff6;font-variant-numeric:tabular-nums}
+.ps-stats-bar-rail{height:9px;border-radius:99px;background:#27342f;overflow:hidden}
+.ps-stats-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#228f80,#83eac0)}
+.ps-stats-donut{--heart-share:50%;height:154px;width:154px;max-width:100%;border-radius:50%;margin:8px auto 21px;background:conic-gradient(#6edfc0 0 var(--heart-share),#eeb16c var(--heart-share) 100%);display:grid;place-items:center;position:relative}
+.ps-stats-donut:before{content:'';position:absolute;inset:22px;background:#151b1b;border-radius:50%}
+.ps-stats-donut span{position:relative;z-index:1;font-size:13px;text-align:center;max-width:85px;font-weight:750}
+.ps-stats-legend{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;color:#dce6df;font-size:12px}
+.ps-stats-unavailable{font-size:23px;font-weight:750;color:#b7c4bc}
+.ps-stats-empty{color:#a8b9af;font-size:13px;padding:10px 0}
+.ps-stats-table-panel{margin-bottom:35px}
+.ps-stats-table-scroll{overflow-x:auto;max-width:100%;margin-top:14px}
+.ps-stats-table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+.ps-stats-table th{font-size:11px;color:#94aaa0;text-transform:uppercase;letter-spacing:.07em;padding:12px;border-bottom:1px solid #40504a}
+.ps-stats-table td{padding:14px 12px;border-bottom:1px solid #293631;color:#e2ede6}
+.ps-stats-table td:not(:first-child){font-variant-numeric:tabular-nums}
+.ps-stats-table tbody tr:hover{background:#1c2924}
+@media(max-width:1000px){.ps-stats-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.ps-stats-charts{grid-template-columns:1fr}.ps-stats-top{grid-row:auto}}
+@media(max-width:500px){.ps-stats-metrics{gap:8px;margin:16px 0}.ps-stats-metric{padding:14px 12px}.ps-stats-number{font-size:26px}.ps-stats-label{font-size:11px}.ps-stats-panel{padding:16px}.ps-stats-table{min-width:460px}}

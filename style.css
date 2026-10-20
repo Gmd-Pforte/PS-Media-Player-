@@ -554,3 +554,10 @@ body:has(.ps-main-nav) #ps-unified-stats{padding-top:24px!important}
 @media(max-width:850px){
  body:has(.ps-main-nav) .wrap>.top{margin-left:-14px!important;width:calc(100% + 28px)!important}
 }
+
+/* Eindeutiger Rückweg ins vollständige Künstlerstudio */
+.ps-studio-return[hidden]{display:none!important}
+body:has(.ps-main-nav) .ps-main-nav .ps-studio-return{display:flex!important;align-items:center;min-height:46px!important;text-decoration:none!important;margin-top:12px!important;padding:12px 14px!important;border:1px solid #548975!important;border-radius:7px!important;background:#214439!important;color:#a8ffe0!important;font-size:14px!important;font-weight:750!important;box-shadow:none!important}
+body:has(.ps-main-nav) .ps-main-nav .ps-studio-return[hidden]{display:none!important}
+body:has(.ps-main-nav) .ps-main-nav .ps-studio-return:focus-visible{outline:2px solid #a8ffe0!important}
+@media(max-width:850px){body:has(.ps-main-nav) .ps-main-nav .ps-studio-return{flex:1 1 100%!important;justify-content:center!important;margin-top:4px!important}}

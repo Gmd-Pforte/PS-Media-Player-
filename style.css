@@ -800,3 +800,20 @@ body.ps-admin-user-open{overflow:hidden}
 .ps-recovery-help #ps-recovery-form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
 .ps-recovery-help p{font-size:13px;color:#b6c8bb}
 @media(max-width:630px){.ps-help-root{right:12px;bottom:85px}.ps-help-trigger{width:52px;height:52px}.ps-help-panel{bottom:62px;right:-5px;max-height:74dvh}}
+
+/* PS MUSIC STREAM · AUTO LIQUID DESIGN (private & artist) */
+:root{--ps-liquid-accent:#a78bfa;--ps-liquid-rgb:167,139,250}
+body.ps-liquid-live{background:#080b13!important;color:#f3f4fb}
+#ps-liquid-canvas{position:fixed;inset:0;width:100%;height:100dvh;z-index:0;pointer-events:none;opacity:.75}
+body.ps-liquid-live>.wrap{position:relative;z-index:1}
+body.ps-liquid-live .ps-unified-shell,body.ps-liquid-live .ps-app-shell,body.ps-liquid-live .ps-listener-layout,body.ps-liquid-live .ps-studio-shell{position:relative;z-index:1}
+body.ps-liquid-live .top{background:rgba(11,13,23,.80)!important;backdrop-filter:blur(18px);border-color:rgba(255,255,255,.09)}
+body.ps-liquid-live .panel,body.ps-liquid-live .card,body.ps-liquid-live .stat-tile,body.ps-liquid-live .adm-card,body.ps-liquid-live .ps-studio-card,body.ps-liquid-live .ps-unified-panel{background-color:rgba(18,21,32,.87)!important;border-color:rgba(255,255,255,.09)!important;backdrop-filter:blur(12px)}
+body.ps-liquid-live .hero{background:linear-gradient(115deg,rgba(18,21,34,.89),rgba(var(--ps-liquid-rgb),.13))!important;border-color:rgba(var(--ps-liquid-rgb),.33)!important}
+body.ps-liquid-live .btn:not(.secondary):not(.danger),body.ps-liquid-live button.ps-auth-active{background:var(--ps-liquid-accent);color:#101020}
+body.ps-liquid-live .btn.secondary{background:rgba(var(--ps-liquid-rgb),.10);border:1px solid rgba(var(--ps-liquid-rgb),.26);color:#f5f1ff}
+body.ps-liquid-live .brand span,body.ps-liquid-live .eyebrow{color:var(--ps-liquid-accent)}
+body.ps-liquid-live input[type=range]{accent-color:var(--ps-liquid-accent)}
+body.ps-liquid-live .ps-help-trigger{background:var(--ps-liquid-accent);border-color:rgba(var(--ps-liquid-rgb),.65)}
+body.ps-liquid-live img,body.ps-liquid-live video,body.ps-liquid-live canvas:not(#ps-liquid-canvas){opacity:1;filter:none}
+@media(prefers-reduced-motion:reduce){#ps-liquid-canvas{opacity:.38}}

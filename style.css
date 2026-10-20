@@ -817,3 +817,42 @@ body.ps-liquid-live input[type=range]{accent-color:var(--ps-liquid-accent)}
 body.ps-liquid-live .ps-help-trigger{background:var(--ps-liquid-accent);border-color:rgba(var(--ps-liquid-rgb),.65)}
 body.ps-liquid-live img,body.ps-liquid-live video,body.ps-liquid-live canvas:not(#ps-liquid-canvas){opacity:1;filter:none}
 @media(prefers-reduced-motion:reduce){#ps-liquid-canvas{opacity:.38}}
+
+/* PS STREAM DESIGN 3 — full demo-inspired layout, shared existing DOM/functionality */
+body.ps-liquid-live{--bg:#080a13;--card:rgba(17,21,34,.94);--line:rgba(255,255,255,.09);--muted:#adb3c9;font-family:Inter,system-ui,Segoe UI,sans-serif;background:#080a13!important}
+body.ps-liquid-live>.wrap{max-width:none;margin:0;min-height:100vh;padding:0 24px 150px 270px}
+body.ps-liquid-live .top{position:sticky;top:0;z-index:70;margin:0 -24px 28px;padding:16px 24px;min-height:80px;border-bottom:1px solid #ffffff16;border-radius:0;background:#10121edb!important}
+body.ps-liquid-live .brand{font-size:21px;letter-spacing:-.045em}
+body.ps-liquid-live .tag{font-size:9px;letter-spacing:.18em}
+body.ps-liquid-live .ps-main-nav{position:fixed!important;top:0!important;bottom:0!important;left:0!important;width:244px!important;height:100dvh!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:8px!important;padding:110px 13px 100px!important;margin:0!important;z-index:65!important;border-right:1px solid #ffffff1b!important;background:#10121fea!important;box-shadow:7px 0 30px #0003!important;overflow-y:auto}
+body.ps-liquid-live .ps-main-nav>button{width:100%!important;text-align:left!important;justify-content:flex-start!important;background:transparent!important;border:1px solid transparent!important;color:#b9c0d4!important;padding:13px 16px!important;border-radius:11px!important;font-size:14px!important}
+body.ps-liquid-live .ps-main-nav>button:hover,body.ps-liquid-live .ps-main-nav>button.active{background:rgba(var(--ps-liquid-rgb),.14)!important;color:#fff!important;border-color:rgba(var(--ps-liquid-rgb),.21)!important}
+body.ps-liquid-live .ps-main-nav button[hidden],body.ps-liquid-live .ps-main-nav>div[hidden]{display:none!important}
+body.ps-liquid-live #ps-artist-submenu{padding:12px 0 0 10px}
+body.ps-liquid-live #ps-artist-submenu button{display:block;width:100%;text-align:left;background:transparent;color:#c3c8d6;border:0;padding:11px;border-radius:8px}
+body.ps-liquid-live #homeview>.hero{padding:40px 42px;min-height:280px;display:flex;align-items:center;position:relative;overflow:hidden;border:1px solid #ffffff1c!important;border-radius:23px;background:linear-gradient(110deg,#171a2bed,rgba(var(--ps-liquid-rgb),.20))!important;box-shadow:0 20px 60px #0003}
+body.ps-liquid-live #homeview>.hero h1{font-size:clamp(35px,4.4vw,64px);line-height:1.07}
+body.ps-liquid-live #homeview>.hero .eyebrow{color:var(--ps-liquid-accent)}
+body.ps-liquid-live .ps-section-heading,body.ps-liquid-live .ps-dashboard-heading{margin-top:22px}
+body.ps-liquid-live .ps-featured-grid,body.ps-liquid-live .artist-grid,body.ps-liquid-live .grid,body.ps-liquid-live .ps-dashboard-covers{gap:18px!important}
+body.ps-liquid-live .ps-featured-grid>*,body.ps-liquid-live .artist-grid>*,body.ps-liquid-live .grid>*,body.ps-liquid-live .ps-dashboard-covers>*{border:1px solid #ffffff16!important;border-radius:16px!important;overflow:hidden;background:#141826e8!important;box-shadow:0 15px 32px #0003;transition:transform .2s ease,border-color .2s ease}
+body.ps-liquid-live .ps-featured-grid>*:hover,body.ps-liquid-live .artist-grid>*:hover,body.ps-liquid-live .grid>*:hover{transform:translateY(-3px);border-color:rgba(var(--ps-liquid-rgb),.5)!important}
+body.ps-liquid-live .ps-dashboard-metrics{gap:16px!important}
+body.ps-liquid-live .ps-dashboard-metrics>*,body.ps-liquid-live .ps-studio-tile{border:1px solid #ffffff20!important;border-radius:17px!important;background:#171a2bed!important;box-shadow:0 18px 40px #0003!important;padding:20px!important}
+body.ps-liquid-live .player{background:#101320f5!important;border-top:1px solid #ffffff20!important;backdrop-filter:blur(22px);box-shadow:0 -12px 40px #0007!important}
+body.ps-liquid-live .ps-studio-shell{display:grid;grid-template-columns:244px minmax(0,1fr);gap:0!important;min-height:calc(100vh - 95px);border:1px solid #ffffff19;border-radius:18px;overflow:hidden;background:#0d101b70}
+body.ps-liquid-live .ps-studio-shell.hidden{display:none!important}
+body.ps-liquid-live #studio .ps-studio-side{background:#101320ee!important;border-right:1px solid #ffffff19!important;padding:26px 16px!important;position:relative!important;width:auto!important;min-width:0!important}
+body.ps-liquid-live #studio .ps-studio-main{min-width:0;padding:0 28px 80px!important;background:transparent!important}
+body.ps-liquid-live #studio .ps-studio-top{padding:26px 0!important;border-bottom:1px solid #ffffff17!important;margin-bottom:24px!important}
+body.ps-liquid-live #studio .ps-studio-nav{display:flex!important;flex-direction:column!important;gap:9px!important}
+body.ps-liquid-live #studio .ps-studio-nav button{width:100%!important;text-align:left!important;border:1px solid transparent!important;border-radius:10px!important;padding:13px 14px!important;background:transparent!important;color:#b8bdd0!important}
+body.ps-liquid-live #studio .ps-studio-nav button.active,body.ps-liquid-live #studio .ps-studio-nav button:hover{background:rgba(var(--ps-liquid-rgb),.15)!important;border-color:rgba(var(--ps-liquid-rgb),.25)!important;color:white!important}
+body.ps-liquid-live #studio .ps-studio-view>h2,body.ps-liquid-live #studio .ps-studio-welcome h2{font-size:clamp(24px,3vw,35px);letter-spacing:-.035em}
+body.ps-liquid-live #studio .ps-studio-card,body.ps-liquid-live #studio .ps-stream-stats{background:#171a2bea!important;border:1px solid #ffffff20!important;border-radius:18px!important;padding:24px!important;box-shadow:0 15px 45px #0004!important}
+body.ps-liquid-live #studio .ps-studio-quick{gap:16px!important}
+body.ps-liquid-live #studio .ps-studio-logo span{color:var(--ps-liquid-accent)}
+body.ps-liquid-live #studio .ps-studio-public-link{display:block;margin-top:24px;color:#bcc5d2}
+@media(min-width:901px){body.ps-liquid-live #ps-mobile-nav-toggle{display:none!important}body.ps-liquid-live .ps-main-nav{top:0!important}body.ps-liquid-live #studio .ps-mobile-studio-menu{display:none!important}}
+@media(max-width:900px){body.ps-liquid-live>.wrap{padding:0 15px 170px!important}body.ps-liquid-live .top{margin:0 -15px 14px;padding:14px 15px}body.ps-liquid-live .ps-main-nav{transform:translateX(-110%);transition:transform .22s ease;top:0!important;width:min(290px,82vw)!important;padding-top:90px!important;z-index:500!important}body.ps-liquid-live .ps-main-nav.ps-mobile-open,body.ps-liquid-live .ps-main-nav.open,body.ps-liquid-live .ps-main-nav[data-open=true]{transform:translateX(0)!important}body.ps-liquid-live .ps-studio-shell{display:block}body.ps-liquid-live #studio .ps-studio-side{padding:15px!important;border-right:0!important;border-bottom:1px solid #ffffff20!important}body.ps-liquid-live #studio .ps-studio-main{padding:0 15px 75px!important}body.ps-liquid-live #studio .ps-studio-nav{flex-direction:row!important;overflow:auto}body.ps-liquid-live #studio .ps-studio-nav button{white-space:nowrap!important;width:auto!important}body.ps-liquid-live #homeview>.hero{padding:27px 22px;min-height:225px}}
+@media(max-width:540px){body.ps-liquid-live .ps-dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.ps-liquid-live .ps-featured-grid,body.ps-liquid-live .artist-grid{gap:10px!important}body.ps-liquid-live .ps-studio-card{padding:14px!important}body.ps-liquid-live #homeview>.hero h1{font-size:34px}}

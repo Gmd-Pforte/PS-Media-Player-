@@ -892,3 +892,29 @@ body.ps-demo-rebuild .ps-demo-player{z-index:80!important;box-shadow:0 -16px 55p
 body.ps-demo-rebuild #ps-mobile-nav-toggle{display:none}
 @media(max-width:900px){body.ps-demo-rebuild>.wrap{display:block!important}body.ps-demo-rebuild .ps-demo-side{position:fixed;top:0;left:0;width:min(285px,85vw);transform:translateX(-110%);transition:transform .2s ease;z-index:110}body.ps-demo-rebuild .ps-demo-side:has(.ps-nav-open){transform:translateX(0)}body.ps-demo-rebuild .ps-demo-main{padding:0 15px 150px}body.ps-demo-rebuild .ps-demo-main>.top{margin:0 -15px 16px!important;padding:14px 15px!important}body.ps-demo-rebuild #ps-mobile-nav-toggle{display:inline-flex;position:relative;z-index:100;margin:0 0 14px 15px}body.ps-demo-rebuild .ps-demo-side .ps-main-nav{visibility:visible!important;transform:none!important}body.ps-demo-rebuild .ps-demo-welcome{padding:25px 22px;min-height:180px}body.ps-demo-rebuild .ps-demo-welcome-symbol{font-size:56px}}
 @media(max-width:560px){body.ps-demo-rebuild .ps-demo-topnote{display:none}body.ps-demo-rebuild .ps-demo-welcome-symbol{display:none}body.ps-demo-rebuild .ps-demo-welcome{padding:22px 19px}body.ps-demo-rebuild .hero.ps-demo-hero{padding:22px!important}body.ps-demo-rebuild .ps-demo-main>.top .brand{font-size:16px}}
+
+/* Artist studio — demo-specific typography, cards and release grid */
+body.ps-liquid-live #studio.ps-studio-shell{background:transparent!important;border:0!important;border-radius:0!important;grid-template-columns:240px minmax(0,1fr)!important;min-height:100dvh!important;margin:-120px -24px 0 -270px!important;overflow:visible!important}
+body.ps-liquid-live #studio .ps-studio-side{position:sticky!important;top:0!important;height:100dvh!important;background:#0e1322eb!important;padding:27px 14px 110px!important;backdrop-filter:blur(20px);border-right:1px solid #ffffff1a!important}
+body.ps-liquid-live #studio .ps-studio-logo{font-size:21px!important;line-height:1.2!important;padding:4px 12px 35px!important}
+body.ps-liquid-live #studio .ps-studio-logo small{color:#8491a6!important;font-size:10px!important;letter-spacing:.15em!important;margin-top:10px}
+body.ps-liquid-live #studio .ps-studio-main{padding:0 30px 155px!important;background:transparent!important}
+body.ps-liquid-live #studio .ps-studio-top{position:sticky!important;top:0!important;z-index:45!important;padding:16px 0!important;min-height:82px!important;margin:0 0 34px!important;background:#0e1220e8!important;backdrop-filter:blur(16px)}
+body.ps-liquid-live #studio .ps-studio-top h1{font-size:22px!important}
+body.ps-liquid-live #studio .ps-studio-welcome{padding:8px 2px 23px!important;background:none!important;border:0!important}
+body.ps-liquid-live #studio .ps-studio-welcome h2{font-size:clamp(32px,4vw,49px)!important;margin:0 0 8px!important;letter-spacing:-.05em}
+body.ps-liquid-live #studio .ps-studio-welcome p{font-size:15px!important}
+body.ps-liquid-live #studio .ps-dashboard-metrics{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;margin:0 0 27px!important}
+body.ps-liquid-live #studio .ps-dashboard-metrics>div{position:relative!important;min-height:140px!important;background:#171c2bdf!important;border-radius:15px!important;padding:25px!important;border:1px solid #ffffff1c!important}
+body.ps-liquid-live #studio .ps-dashboard-metrics strong{font-size:clamp(26px,3vw,40px)!important;letter-spacing:-.04em!important;color:#fff!important}
+body.ps-liquid-live #studio .ps-dashboard-metrics small{font-size:13px!important;color:#abb4cb!important}
+body.ps-liquid-live #studio .ps-studio-quick{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;margin:0 0 30px!important}
+body.ps-liquid-live #studio .ps-studio-tile{min-height:115px!important;text-align:left!important;padding:20px!important;background:rgba(19,23,38,.88)!important}
+body.ps-liquid-live #studio .ps-studio-tile span{color:var(--ps-liquid-accent);font-size:24px}
+body.ps-liquid-live #studio .ps-studio-tile strong{font-size:14px}
+body.ps-liquid-live #studio .ps-overview-releases{padding:23px!important;background:#151a2ada!important}
+body.ps-liquid-live #studio .ps-overview-release-title h2{font-size:24px!important}
+body.ps-liquid-live #studio #ps-overview-tracks{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(205px,1fr))!important;gap:17px!important}
+body.ps-liquid-live #studio #ps-overview-tracks>*{border:1px solid #ffffff1d!important;border-radius:14px!important;background:#1a2030ee!important;min-width:0!important;overflow:hidden}
+@media(max-width:900px){body.ps-liquid-live #studio.ps-studio-shell{margin:0!important;display:block!important}body.ps-liquid-live #studio .ps-studio-side{position:relative!important;height:auto!important;padding:16px!important}body.ps-liquid-live #studio .ps-studio-main{padding:0 16px 145px!important}body.ps-liquid-live #studio .ps-studio-top{position:relative!important}body.ps-liquid-live #studio .ps-dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.ps-liquid-live #studio .ps-studio-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:570px){body.ps-liquid-live #studio .ps-dashboard-metrics{grid-template-columns:1fr!important}body.ps-liquid-live #studio .ps-studio-quick{gap:8px!important}}

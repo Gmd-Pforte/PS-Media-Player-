@@ -721,3 +721,23 @@ body:has(.ps-main-nav) .player,.player{position:fixed!important;left:0!important
 .player.expanded #ps-queue-panel{width:100%!important;max-height:230px!important;overflow-y:auto!important;background:#14201c!important}
 body.ps-full-player-open{overflow:hidden!important}
 @media(max-width:680px){.player:not(.expanded){gap:8px!important;padding:8px 12px!important;flex-wrap:nowrap!important}.player:not(.expanded) .phead{flex:1!important;min-width:0!important;gap:8px!important}.player:not(.expanded) .phead #pcover{width:44px!important;height:44px!important}.player:not(.expanded) .phead #close{display:none!important}.player:not(.expanded) #ps-mini-actions{flex:0 0 auto!important;gap:0!important}.player:not(.expanded) #ps-mini-actions #ps-mini-prev{display:none!important}.player:not(.expanded) #ps-mini-actions button{min-width:39px!important}.player:not(.expanded) #expand{font-size:0!important;min-width:36px!important;max-width:36px!important;padding:4px!important}.player:not(.expanded) #expand:before{content:'⤢';font-size:20px}.player.expanded{padding:14px 15px 25px!important}.player.expanded .ps-album-art{width:min(78vw,40vh)!important}.player.expanded .ps-controls{gap:6px!important}.player.expanded .ps-controls button{font-size:21px!important;min-width:43px!important}.player.expanded #ps-title-large{font-size:24px!important}}
+
+/* Moderne gemeinsame Anmeldung: Privatkonto | Künstlerkonto */
+body:has(.ps-auth-panel){background:#0a1010!important;min-height:100dvh;color:#f2f8f4}
+body:has(.ps-auth-panel) .wrap{width:100%!important;max-width:none!important;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:0 18px 30px!important;box-sizing:border-box}
+body:has(.ps-auth-panel) .top{width:min(1120px,100%)!important;box-sizing:border-box;display:flex!important;align-items:center;justify-content:space-between;padding:25px 4px!important;margin:0 auto 45px!important;background:transparent!important;border:0!important;box-shadow:none!important}
+body:has(.ps-auth-panel) .ps-auth-panel{width:min(560px,100%)!important;max-width:560px!important;box-sizing:border-box!important;margin:0 auto!important;padding:32px!important;background:#151d1c!important;border:1px solid #2d403a!important;border-radius:18px!important;box-shadow:0 24px 75px #0007!important}
+.ps-auth-panel h1{font-size:clamp(27px,3vw,36px)!important;line-height:1.16!important;margin:0 0 10px!important;letter-spacing:-.04em!important}
+.ps-auth-panel>p{font-size:14px;line-height:1.6;color:#a6b8af}
+.ps-auth-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:26px 0 13px;padding:5px;border:1px solid #30473d;background:#0b1311;border-radius:12px}
+.ps-auth-tabs .ps-auth-tab{min-height:52px;border:1px solid transparent;border-radius:8px;background:transparent;color:#a4b9b0;font-size:15px;font-weight:750;cursor:pointer}
+.ps-auth-tabs .ps-auth-tab.active{background:#24483b;color:#a2f3d1;border-color:#3c7762;box-shadow:none}
+.ps-auth-tabs .ps-auth-tab:focus-visible{outline:2px solid #90f0cb;outline-offset:2px}
+.ps-auth-hint{font-size:13px!important;min-height:38px;color:#a5b7ae!important;margin:0 0 23px!important}
+.ps-auth-panel #login-fields>label{display:block;font-size:13px;font-weight:650;margin:15px 0 8px;color:#d6e6dd}
+.ps-auth-panel #email,.ps-auth-panel #password,.ps-auth-panel #new-password{width:100%!important;max-width:100%!important;box-sizing:border-box!important;min-height:49px;padding:13px 14px;border-radius:9px!important;background:#0c1513!important;border:1px solid #3c5046!important;color:#f4faf6!important}
+.ps-auth-panel #login-fields>.actions{display:flex;gap:10px;margin-top:24px}
+.ps-auth-panel #login-fields>.actions .btn{flex:1;min-height:48px;font-weight:700}
+.ps-auth-panel #status{color:#adf0d3}
+body:has(.ps-auth-panel) .ps-legal-links{margin-top:24px}
+@media(max-width:600px){body:has(.ps-auth-panel) .top{margin-bottom:20px!important;padding:18px 2px!important}body:has(.ps-auth-panel) .ps-auth-panel{padding:23px 18px!important;border-radius:14px!important}.ps-auth-tabs .ps-auth-tab{font-size:13px}.ps-auth-panel #login-fields>.actions{flex-direction:column}.ps-auth-panel #login-fields>.actions button{width:100%}}

@@ -683,3 +683,41 @@ body:has(.ps-main-nav) #ps-unified-overview{max-width:1450px}
 .ps-stats-table tbody tr:hover{background:#1c2924}
 @media(max-width:1000px){.ps-stats-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.ps-stats-charts{grid-template-columns:1fr}.ps-stats-top{grid-row:auto}}
 @media(max-width:500px){.ps-stats-metrics{gap:8px;margin:16px 0}.ps-stats-metric{padding:14px 12px}.ps-stats-number{font-size:26px}.ps-stats-label{font-size:11px}.ps-stats-panel{padding:16px}.ps-stats-table{min-width:460px}}
+
+/* Premium-Player: kompakt beim Stöbern, groß nach Öffnen */
+body:has(.ps-main-nav) .player,.player{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:150!important;width:100%!important;max-width:none!important;min-height:0!important;background:#111818!important;border:0!important;border-top:1px solid #30443e!important;border-radius:0!important;padding:10px 20px!important;box-shadow:0 -12px 36px #0008!important;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.player[hidden]{display:none!important}
+.player .phead{display:flex!important;align-items:center!important;gap:11px!important;flex:1 1 310px!important;min-width:0!important;margin:0!important}
+.player .phead #pcover{width:52px!important;height:52px!important;flex-shrink:0!important;overflow:hidden!important;border-radius:6px!important}
+.player .phead #pcover img{width:100%!important;height:100%!important;object-fit:cover!important}
+.player .phead .info{flex:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:4px!important}
+.player .phead .info strong,.player .phead .info small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player .phead #close{font-size:12px!important;padding:8px!important}
+#ps-mini-actions{display:flex;align-items:center;justify-content:center;gap:11px;flex:0 1 240px}
+#ps-mini-actions button{background:transparent;border:0;color:#e5f2ed;font-size:19px;min-height:42px;min-width:42px;cursor:pointer}
+#ps-mini-actions #ps-mini-play{background:#72e6bf;color:#0c231a;border-radius:50%;width:46px;height:46px;box-shadow:none;font-weight:800}
+#ps-mini-progress{height:3px;background:#3b4944;position:absolute;top:0;left:0;right:0;cursor:default}
+#ps-mini-progress-fill{width:0;height:100%;background:#76e7be}
+.player:not(.expanded) #ps-audio-panel{display:none!important}
+.player.expanded{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-height:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;overflow-y:auto!important;padding:24px 20px max(30px,env(safe-area-inset-bottom))!important;background:radial-gradient(ellipse at 50% 12%,#183e35,#0d1616 57%,#090d0e)!important;z-index:9999!important;border:0!important}
+.player.expanded .phead{flex:0 0 auto!important;width:min(740px,100%)!important;justify-content:flex-end!important}
+.player.expanded .phead #pcover{display:none!important}
+.player.expanded .phead .info{display:none!important}
+.player.expanded #ps-mini-actions,.player.expanded #ps-mini-progress{display:none!important}
+.player.expanded #ps-audio-panel{display:flex!important;flex-direction:column!important;gap:20px!important;align-items:center!important;width:min(740px,100%)!important;max-height:none!important;overflow:visible!important;margin:auto!important;padding:10px 0 40px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.player.expanded .ps-album-stage{display:flex!important;flex-direction:column!important;align-items:center!important;gap:18px!important;width:100%!important}
+.player.expanded .ps-album-art{width:min(390px,65vh,100%)!important;height:auto!important;aspect-ratio:1!important;border-radius:14px!important;overflow:hidden!important;box-shadow:0 20px 65px #000a!important}
+.player.expanded .ps-album-art img{height:100%!important;width:100%!important;object-fit:cover!important}
+.player.expanded .ps-album-caption{text-align:center!important;display:flex!important;flex-direction:column!important;gap:5px!important}
+.player.expanded #ps-title-large{font-size:clamp(22px,3vw,34px)!important;line-height:1.18!important;font-weight:800!important}
+.player.expanded #ps-artist-large{font-size:15px!important;color:#acc8bd!important}
+.player.expanded .ps-progress{width:100%!important;display:flex!important;align-items:center!important;gap:12px!important}
+.player.expanded #ps-seek{flex:1!important;accent-color:#7becc6!important}
+.player.expanded .ps-controls{display:flex!important;align-items:center!important;justify-content:center!important;gap:20px!important;flex-wrap:wrap!important}
+.player.expanded .ps-controls button{background:transparent!important;border:0!important;color:#ecf7f2!important;font-size:24px!important;min-width:48px!important;min-height:48px!important}
+.player.expanded .ps-controls #ps-play{background:#78e7c2!important;color:#102a20!important;border-radius:50%!important;width:66px!important;height:66px!important;font-size:27px!important}
+.player.expanded .ps-volume{display:flex!important;align-items:center!important;gap:10px!important}
+.player.expanded .ps-song-reactions{width:100%!important;max-width:600px!important}
+.player.expanded #ps-queue-panel{width:100%!important;max-height:230px!important;overflow-y:auto!important;background:#14201c!important}
+body.ps-full-player-open{overflow:hidden!important}
+@media(max-width:680px){.player:not(.expanded){gap:8px!important;padding:8px 12px!important;flex-wrap:nowrap!important}.player:not(.expanded) .phead{flex:1!important;min-width:0!important;gap:8px!important}.player:not(.expanded) .phead #pcover{width:44px!important;height:44px!important}.player:not(.expanded) .phead #close{display:none!important}.player:not(.expanded) #ps-mini-actions{flex:0 0 auto!important;gap:0!important}.player:not(.expanded) #ps-mini-actions #ps-mini-prev{display:none!important}.player:not(.expanded) #ps-mini-actions button{min-width:39px!important}.player:not(.expanded) #expand{font-size:0!important;min-width:36px!important;max-width:36px!important;padding:4px!important}.player:not(.expanded) #expand:before{content:'⤢';font-size:20px}.player.expanded{padding:14px 15px 25px!important}.player.expanded .ps-album-art{width:min(78vw,40vh)!important}.player.expanded .ps-controls{gap:6px!important}.player.expanded .ps-controls button{font-size:21px!important;min-width:43px!important}.player.expanded #ps-title-large{font-size:24px!important}}

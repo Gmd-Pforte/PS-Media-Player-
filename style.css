@@ -741,3 +741,11 @@ body:has(.ps-auth-panel) .ps-auth-panel{width:min(560px,100%)!important;max-widt
 .ps-auth-panel #status{color:#adf0d3}
 body:has(.ps-auth-panel) .ps-legal-links{margin-top:24px}
 @media(max-width:600px){body:has(.ps-auth-panel) .top{margin-bottom:20px!important;padding:18px 2px!important}body:has(.ps-auth-panel) .ps-auth-panel{padding:23px 18px!important;border-radius:14px!important}.ps-auth-tabs .ps-auth-tab{font-size:13px}.ps-auth-panel #login-fields>.actions{flex-direction:column}.ps-auth-panel #login-fields>.actions button{width:100%}}
+
+/* Kontowahl: zwei deutlich erkennbare Buttons */
+.ps-auth-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;padding:0!important;background:transparent!important;border:0!important;margin:24px 0 14px!important}
+.ps-auth-tabs .ps-auth-tab{appearance:none!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-height:58px!important;width:100%!important;padding:12px 10px!important;border-radius:11px!important;border:2px solid #455b54!important;background:#202b28!important;color:#d7e5dd!important;font-size:15px!important;font-weight:750!important;letter-spacing:0!important;box-shadow:0 4px 12px #0003!important;cursor:pointer!important;transition:background .15s,border-color .15s,transform .15s!important}
+.ps-auth-tabs .ps-auth-tab:hover{background:#2c4439!important;border-color:#79d9b9!important}
+.ps-auth-tabs .ps-auth-tab.active{background:#70dfba!important;border-color:#9affd8!important;color:#10251b!important;box-shadow:0 0 0 2px #74dfbd35,0 6px 18px #0004!important}
+.ps-auth-tabs .ps-auth-tab:focus-visible{outline:3px solid #a6f7d8!important;outline-offset:3px!important}
+@media(max-width:460px){.ps-auth-tabs{gap:8px!important}.ps-auth-tabs .ps-auth-tab{font-size:13px!important;padding:11px 5px!important;min-height:54px!important}}

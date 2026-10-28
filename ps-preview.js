@@ -5,7 +5,7 @@
    "ps-music-previews". Der vollständige Song bleibt geschützt.
    ===================================================================== */
 (()=>{'use strict';
-const PREVIEW_LEN=30, MAX_BYTES=1363148, BUCKET='ps-music-previews';
+const PREVIEW_LEN=30, MAX_BYTES=1363148;
 const SR={3:[44100,48000,32000],2:[22050,24000,16000],0:[11025,12000,8000]};
 const BR1=[0,32,40,48,56,64,80,96,112,128,160,192,224,256,320],BR2=[0,8,16,24,32,40,48,56,64,80,96,112,128,144,160];
 
@@ -50,20 +50,25 @@ async function token(){
   const ss=typeof validListenerSession==='function'?await validListenerSession():null;
   if(!ss?.access_token)throw Error('Bitte erneut anmelden.');return ss.access_token;
 }
-let myId=null;
-async function uid(tok){if(myId)return myId;const r=await fetch(API+'/auth/v1/user',{headers:{apikey:ANON,Authorization:'Bearer '+tok}});if(!r.ok)throw Error('Sitzung abgelaufen.');myId=(await r.json()).id;return myId}
-async function save(songId,blob,start){
+/* Die Hörprobe erzeugt der Server (Edge Function "psms-preview"):
+   Er prüft Konto und Song, schneidet selbst höchstens 30 Sekunden
+   und räumt alte Dateien auf. Der Browser schickt nur die Startstelle. */
+async function save(songId,start){
   if(!await enabled())throw Error('Hörproben sind in der Datenbank noch nicht eingerichtet.');
-  const tok=await token(),me=await uid(tok),path=me+'/'+songId+'-'+Date.now()+'.mp3';
-  const up=await fetch(API+'/storage/v1/object/'+BUCKET+'/'+path,{method:'POST',headers:{apikey:ANON,Authorization:'Bearer '+tok,'Content-Type':'audio/mpeg'},body:blob});
-  if(!up.ok)throw Error('Hörprobe konnte nicht gespeichert werden ('+up.status+').');
-  const url=API+'/storage/v1/object/public/'+BUCKET+'/'+path;
-  const r=await fetch(API+'/rest/v1/psms_artist_songs?id=eq.'+encodeURIComponent(songId)+'&owner_id=eq.'+encodeURIComponent(me),{method:'PATCH',headers:{apikey:ANON,Authorization:'Bearer '+tok,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({preview_url:url,preview_start:start})});
-  if(!r.ok)throw Error('Hörprobe konnte dem Song nicht zugeordnet werden.');
-  return url;
+  const tok=await token();let r;
+  try{r=await fetch(API+'/functions/v1/psms-preview',{method:'POST',headers:{apikey:ANON,Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({song_id:songId,start:Number.isFinite(start)?Math.round(start):null})})}
+  catch{throw Error('Der Hörproben-Dienst ist gerade nicht erreichbar.')}
+  const data=await r.json().catch(()=>({}));
+  if(r.status===404&&!data.error)throw Error('Der Hörproben-Dienst ist noch nicht eingerichtet.');
+  if(!r.ok||!data.ok)throw Error(data.error||('Hörprobe konnte nicht gespeichert werden ('+r.status+').'));
+  return data;
 }
-/* Direkt beim Hochladen: aus der ausgewählten Datei */
-async function fromFile(file,songId){if(!await enabled())return null;const c=cut(await file.arrayBuffer());return save(songId,c.blob,c.start)}
+async function remove(songId){
+  const tok=await token();const r=await fetch(API+'/functions/v1/psms-preview',{method:'POST',headers:{apikey:ANON,Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({song_id:songId,action:'delete'})});
+  const data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)throw Error(data.error||'Hörprobe konnte nicht entfernt werden.');return data;
+}
+/* Direkt beim Hochladen: Server wählt eine gute Stelle (ca. ein Drittel des Songs) */
+async function fromFile(_file,songId){if(!await enabled())return null;return save(songId,null)}
 
 /* ---------- Editor: Stelle der Hörprobe wählen ---------- */
 const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
@@ -110,9 +115,9 @@ async function openEditor(tracks){
   }
   sel.onchange=load;
   play.onclick=()=>{if(audio){stop();return}try{const c=cut(buf,Number(range.value));blobUrl=URL.createObjectURL(c.blob);audio=new Audio(blobUrl);audio.onended=stop;audio.play().catch(()=>{});play.textContent='⏸ Stopp';win.classList.add('psl-playing')}catch(e){status.textContent=e.message}};
-  saveBtn.onclick=async()=>{saveBtn.disabled=true;status.textContent='Hörprobe wird gespeichert …';try{const c=cut(buf,Number(range.value));await save(current.id,c.blob,c.start);current.preview_start=c.start;status.textContent='✓ Hörprobe gespeichert ('+fmt(c.start)+' bis '+fmt(c.start+c.length)+').'}catch(e){status.textContent=e.message}finally{saveBtn.disabled=false}};
+  saveBtn.onclick=async()=>{saveBtn.disabled=true;status.textContent='Hörprobe wird gespeichert …';try{const res=await save(current.id,Number(range.value));current.preview_start=res.start;range.value=String(res.start);paintWin();status.textContent='✓ Hörprobe gespeichert ('+fmt(res.start)+' bis '+fmt(res.start+res.length)+').'}catch(e){status.textContent=e.message}finally{saveBtn.disabled=false}};
   load();
 }
 
-window.psPreview={enabled,parseFrames,cut,defaultStart,save,fromFile,openEditor,PREVIEW_LEN};
+window.psPreview={enabled,parseFrames,cut,defaultStart,save,remove,fromFile,openEditor,PREVIEW_LEN};
 })();

@@ -1,1 +1,359 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PS MUSIC STREAM – Anmeldung</title><link rel="stylesheet" href="style.css?v=support-universal-1"><link rel="icon" href="ps-icon.svg?v=1" type="image/svg+xml"><link rel="apple-touch-icon" href="ps-icon.svg"><link rel="manifest" href="manifest.webmanifest"></head><body><main class="wrap"><header class="top"><div class="brand">PS <span>MUSIC STREAM</span></div></header><section class="panel ps-auth-panel"><h1>Willkommen bei PS MUSIC STREAM</h1><p>Ein Konto für Musik hören und – mit Künstlerberechtigung – eigene Musik verwalten.</p><div id="login-fields"><div class="ps-auth-tabs" role="group" aria-label="Kontotyp wählen"><button type="button" id="ps-role-private" class="ps-auth-tab active" data-role="listener" aria-pressed="true">♬ Privatkonto</button><button type="button" id="ps-role-artist" class="ps-auth-tab" data-role="artist" aria-pressed="false">♩ Künstlerkonto</button></div><p id="ps-auth-role-hint" class="ps-auth-hint">Deine Musik entdecken, Lieblingssongs speichern und Playlists erstellen.</p><label>E-Mail</label><input id="email" type="email" autocomplete="email"><label>Passwort (mindestens 12 Zeichen)</label><input id="password" type="password" autocomplete="current-password"><div class="actions"><button id="register" class="btn">Privatkonto registrieren</button><button id="login" class="btn secondary">Anmelden</button></div></div><div id="account" class="hidden"><h2>Mein Konto</h2><a class="btn" href="index.html">▶ Zur Musik-Startseite</a><p id="who"></p><label>Neues Passwort</label><input id="new-password" type="password" minlength="12" autocomplete="new-password"><button id="change-password" class="btn secondary">Passwort ändern</button><button id="logout" class="btn secondary">Abmelden</button></div><p id="status" role="status"></p><div class="ps-recovery-help"><button id="ps-recovery-open" type="button" class="btn secondary">🔑 Passwort vergessen?</button><div id="ps-recovery-form" hidden><p>Gib deine E-Mail-Adresse ein. Wenn ein Konto dazu besteht, erhältst du einen sicheren Link zum Zurücksetzen.</p><label for="ps-recovery-email">E-Mail-Adresse</label><input id="ps-recovery-email" type="email" autocomplete="email"><button id="ps-recovery-send" class="btn" type="button">Reset-Link anfordern</button><p id="ps-recovery-status" role="status"></p></div></div></section><div class="ps-legal-links" style="text-align:center;padding:18px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></div></main><script src="cloud.js?v=authfix-1"></script><script src="support-widget.js?v=1"></script><script src="listener.js?v=enter-login-1"></script><script src="password-eye.js?v=1"></script></body></html>
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07060b">
+<title>PS MUSIC STREAM – Anmeldung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="ps-icon.svg?v=1" type="image/svg+xml">
+<link rel="apple-touch-icon" href="ps-icon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{
+  color-scheme:dark;
+  --ink:#07060b;--line:rgba(255,255,255,.09);--line-2:rgba(255,255,255,.16);
+  --text:#f4f1fa;--muted:#a19cb2;--dim:#6f6a80;
+  --violet:#a78bfa;--mint:#5eead4;--red:#ff7a8a;
+  --glow:linear-gradient(115deg,#ff7a59 0%,#e0569f 45%,#8b6cf6 100%);
+  --c1:#8b6cf6;--c2:#e0569f;
+  --display:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;min-height:100dvh;background:var(--ink);color:var(--text);font:15px/1.55 var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:var(--violet)}
+.hidden,[hidden]{display:none!important}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.stage{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.aura{position:absolute;inset:-25%;filter:blur(70px);opacity:.75}
+.aura i{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:float 16s ease-in-out infinite;transition:background 1s}
+.aura i:nth-child(1){width:50%;height:50%;left:50%;top:0;background:var(--c1)}
+.aura i:nth-child(2){width:42%;height:42%;left:5%;top:45%;background:var(--c2);animation-delay:-5s;animation-duration:19s}
+.aura i:nth-child(3){width:30%;height:30%;left:45%;top:55%;background:#ff7a59;animation-delay:-9s;animation-duration:13s;opacity:.7}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-8%,6%) scale(1.12)}66%{transform:translate(6%,-5%) scale(.92)}}
+#particles{position:absolute;inset:0;width:100%;height:100%}
+.stage::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 20%,rgba(7,6,11,.75) 80%)}
+
+.page{position:relative;z-index:1;min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:1fr;align-items:center;gap:28px;padding:20px 18px calc(28px + env(safe-area-inset-bottom));max-width:1180px;margin:0 auto}
+@media (min-width:960px){.page{grid-template-columns:1.1fr 1fr;gap:60px;padding:40px}}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.logo-mark{width:42px;height:42px;border-radius:13px;background:var(--glow);background-size:200% 200%;display:grid;place-items:center;font:800 16px var(--display);color:#fff;letter-spacing:-.04em;animation:shift 6s ease infinite;box-shadow:0 8px 28px -8px rgba(224,86,159,.9)}
+@keyframes shift{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.logo-text{font:800 17px/1 var(--display);letter-spacing:-.03em}
+.logo-text small{display:block;font:700 9px var(--body);letter-spacing:.2em;color:var(--muted);margin-top:4px}
+.intro h1{font:800 clamp(40px,8vw,84px)/.92 var(--display);letter-spacing:-.045em;margin:28px 0 16px}
+.intro h1 .w{display:inline-block;opacity:0;transform:translateY(40%) rotate(4deg);animation:word .9s cubic-bezier(.2,.8,.2,1) forwards}
+.intro h1 em{font-style:normal;background:linear-gradient(115deg,#ff7a59,#e0569f,#8b6cf6,#ff7a59);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:word .9s .3s cubic-bezier(.2,.8,.2,1) forwards,flow 6s linear infinite}
+@keyframes word{to{opacity:1;transform:none}}
+@keyframes flow{to{background-position:300% 0}}
+.intro>p{color:rgba(255,255,255,.72);max-width:440px;font-size:16px;opacity:0;animation:word .9s .5s forwards}
+.perks{display:flex;flex-direction:column;gap:12px;margin-top:26px;opacity:0;animation:word .9s .65s forwards}
+.perk{display:flex;align-items:center;gap:12px;font-weight:700;font-size:14px}
+.perk i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-style:normal;font-size:17px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
+.wave{display:flex;align-items:center;gap:4px;height:46px;margin-top:30px;opacity:0;animation:word .9s .8s forwards}
+.wave span{width:4px;border-radius:4px;background:var(--glow);height:20%;animation:bar 1.2s ease-in-out infinite}
+@keyframes bar{0%,100%{height:18%}50%{height:100%}}
+@media (max-width:959.98px){.intro h1{font-size:clamp(38px,11vw,56px);margin:22px 0 10px}.perks,.wave{display:none}.intro>p{font-size:15px}}
+
+.card{position:relative;width:100%;max-width:480px;justify-self:center;padding:26px 22px 24px;border-radius:30px;
+  background:rgba(20,17,29,.74);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);border:1px solid var(--line-2);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.9);animation:cardin .9s .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cardin{from{opacity:0;transform:translateY(24px)}}
+@media (min-width:480px){.card{padding:32px 30px 28px}}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(140deg,rgba(255,255,255,.35),transparent 30%,transparent 70%,var(--c2));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card h2{font:800 28px/1.05 var(--display);letter-spacing:-.035em}
+.card .sub{color:var(--muted);font-size:14px;margin-top:6px}
+
+.mode{display:flex;gap:18px;margin-top:22px;border-bottom:1px solid var(--line)}
+.mode button{position:relative;padding:0 0 12px;font-weight:800;font-size:14.5px;color:var(--dim);transition:color .2s}
+.mode button.on{color:var(--text)}
+.mode button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--glow)}
+
+.ps-auth-tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:20px;padding:5px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.ps-auth-tabs .pill{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 8px);border-radius:15px;background:var(--glow);box-shadow:0 10px 26px -10px rgba(224,86,159,.9);transition:transform .45s cubic-bezier(.2,.9,.3,1.15)}
+.ps-auth-tabs[data-role=artist] .pill{transform:translateX(calc(100% + 6px))}
+.ps-auth-tab{position:relative;z-index:1;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:15px;text-align:left}
+.ps-auth-tab .ri{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.1);font-size:16px}
+.ps-auth-tab strong{display:block;font-weight:800;font-size:14px;line-height:1.2}
+.ps-auth-tab small{display:block;font-size:11.5px;font-weight:600;color:var(--muted);line-height:1.25;transition:color .3s}
+.ps-auth-tab.active small{color:rgba(255,255,255,.88)}
+.ps-auth-hint{margin-top:12px;font-size:13px;color:var(--muted);min-height:20px}
+
+.field{position:relative;margin-top:16px}
+.field input{width:100%;height:58px;padding:22px 48px 6px 16px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);outline:0;transition:border-color .2s,background .2s,box-shadow .2s}
+.field label{position:absolute;left:16px;top:18px;font-weight:600;color:var(--dim);pointer-events:none;transition:all .2s cubic-bezier(.2,.8,.2,1)}
+.field input:focus,.field input:not(:placeholder-shown){background:rgba(255,255,255,.07)}
+.field input:focus{border-color:rgba(167,139,250,.8);box-shadow:0 0 0 4px rgba(167,139,250,.15)}
+.field input:focus+label,.field input:not(:placeholder-shown)+label{top:8px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--violet)}
+.field.bad input{border-color:rgba(255,122,138,.7)}
+.field.good input:not(:focus){border-color:rgba(94,234,212,.45)}
+.field .ok{position:absolute;right:16px;top:19px;color:var(--mint);opacity:0;transform:scale(.5);transition:.25s;pointer-events:none}
+.field.good .ok{opacity:1;transform:none}
+.field .eye{position:absolute;right:8px;top:9px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--muted)}
+.field .eye:hover{background:rgba(255,255,255,.07);color:var(--text)}
+.err{font-size:12px;font-weight:700;color:var(--red);margin:6px 4px 0;max-height:0;overflow:hidden;transition:max-height .25s}
+.field.bad+.err{max-height:40px}
+.strength{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 2px 0}
+.strength i{height:4px;border-radius:4px;background:rgba(255,255,255,.1);transition:background .3s}
+.strength-text{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--dim);margin:6px 2px 0}
+.card:not([data-mode=register]) .register-only{display:none!important}
+.card[data-mode=register] .login-only{display:none!important}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:13px}
+.check{display:flex;align-items:center;gap:9px;cursor:pointer;color:var(--muted);font-weight:600}
+.check input{appearance:none;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-2);display:grid;place-items:center;transition:.2s;cursor:pointer;flex:none}
+.check input:checked{background:var(--violet);border-color:var(--violet)}
+.check input:checked::after{content:"";width:5px;height:10px;border:solid #0b0910;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.link{color:var(--violet);font-weight:800;font-size:13px}
+.link:hover{color:#c9b8ff}
+
+.submit{position:relative;width:100%;height:56px;margin-top:20px;border-radius:999px;background:#fff;color:#0b0910;font-weight:800;font-size:15.5px;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,opacity .2s}
+.submit:active{transform:scale(.98)}
+.submit::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(167,139,250,.45) 50%,transparent 70%);transform:translateX(-100%);animation:sheen 3.5s 1.5s infinite}
+@keyframes sheen{40%,100%{transform:translateX(100%)}}
+.submit:disabled{color:transparent;pointer-events:none}
+.submit:disabled::before{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border-radius:50%;border:2.5px solid rgba(11,9,16,.2);border-top-color:#0b0910;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.or{display:flex;align-items:center;gap:12px;margin:20px 0 0;color:var(--dim);font-size:12px;font-weight:700}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.alt{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:14px;font-size:13.5px;color:var(--muted)}
+.alt button{color:var(--text);font-weight:800}
+#status:empty,#ps-recovery-status:empty,.local-msg:empty{display:none}
+#status,#ps-recovery-status,.local-msg{margin-top:16px;padding:12px 14px;border-radius:14px;font-size:13px;font-weight:600;background:rgba(255,122,138,.12);color:#ffc2ca;border:1px solid rgba(255,122,138,.3);animation:pop .35s cubic-bezier(.2,.9,.3,1.2)}
+#status.info,#ps-recovery-status{background:rgba(167,139,250,.12);color:#ddd2ff;border-color:rgba(167,139,250,.3)}
+@keyframes pop{from{opacity:0;transform:scale(.95)}}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-weight:800;font-size:13px;margin-bottom:16px}
+.back:hover{color:var(--text)}
+.card.recovery #login-fields,.card.recovery .main-only{display:none}
+.card:not(.recovery) .recovery-only{display:none}
+#ps-recovery-form{animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+#account{text-align:center}
+#account h2{margin-bottom:14px}
+#account .submit{text-decoration:none}
+#account input{width:100%;height:52px;padding:0 16px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);margin-top:6px}
+#account label{display:block;text-align:left;font-weight:800;font-size:12.5px;margin-top:16px}
+#account .ghost{display:block;width:100%;height:46px;margin-top:10px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.05);font-weight:800}
+#who{color:var(--muted);font-size:13px;margin-top:12px}
+.foot{grid-column:1/-1;display:flex;justify-content:center;gap:20px;font-size:13px}
+.foot a{color:var(--muted);text-decoration:none}
+.foot a:hover{color:var(--text)}
+.fly{position:fixed;z-index:99;pointer-events:none;font-size:18px;animation:flyout 1s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes flyout{to{transform:translate(var(--dx),var(--dy)) scale(.4) rotate(var(--r));opacity:0}}
+/* Support-Knopf */
+.ps-help-root{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:50}
+@media (max-width:959.98px){.ps-help-root{top:18px;bottom:auto}.ps-help-trigger{width:42px;height:42px;font-size:17px}.ps-help-panel{top:52px;bottom:auto}}
+.ps-help-trigger{width:50px;height:50px;border-radius:50%;background:var(--glow);font-size:20px;box-shadow:0 12px 30px -8px rgba(224,86,159,.8)}
+.ps-help-panel{position:absolute;bottom:62px;right:0;width:min(380px,calc(100vw - 30px));max-height:min(70dvh,620px);display:flex;flex-direction:column;border-radius:22px;overflow:hidden;background:#14111d;border:1px solid var(--line-2);box-shadow:0 30px 70px -20px #000}
+.ps-help-panel>header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(115deg,rgba(255,122,89,.25),rgba(139,108,246,.25))}
+.ps-help-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1)}
+.ps-help-content{padding:14px 18px 18px;overflow-y:auto;font-size:13px;color:var(--muted)}
+.ps-help-new,.ps-help-reply{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.ps-help-new input,.ps-help-new textarea,.ps-help-reply textarea{width:100%;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);margin-top:5px}
+.ps-help-new button,.ps-help-reply button{height:42px;border-radius:999px;background:#fff;color:#0b0910;font-weight:800}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.intro h1 .w,.intro>p,.perks,.wave{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="stage" aria-hidden="true"><div class="aura"><i></i><i></i><i></i></div><canvas id="particles"></canvas></div>
+
+<main class="page">
+  <section class="intro">
+    <a class="logo" href="index.html" id="home-link"><div class="logo-mark">PS</div><div class="logo-text">Music Stream<small>MUSIK AUS ECHTEN GEFÜHLEN</small></div></a>
+    <h1><span class="w">Schön,</span> <span class="w" style="animation-delay:.1s">dass</span> <span class="w" style="animation-delay:.2s">du</span> <em class="w">da bist.</em></h1>
+    <p>Ein Konto für alles: Musik hören, Lieblingssongs sammeln und mit Künstlerkonto deine eigene Musik veröffentlichen.</p>
+    <div class="perks" id="perks"></div>
+    <div class="wave" id="wave" aria-hidden="true"></div>
+  </section>
+
+  <section class="card" id="card" data-mode="login" aria-label="Anmeldung">
+    <div class="main-only">
+      <h2 id="title">Willkommen zurück</h2>
+      <p class="sub" id="subtitle">Melde dich an und hör weiter, wo du aufgehört hast.</p>
+    </div>
+
+    <div class="recovery-only">
+      <button type="button" class="back" id="recovery-back">← Zurück zur Anmeldung</button>
+      <h2>Passwort vergessen?</h2>
+      <p class="sub">Kein Problem. Gib deine E-Mail ein, wir schicken dir einen sicheren Link zum Zurücksetzen.</p>
+    </div>
+
+    <div id="login-fields">
+      <div class="mode" role="tablist" aria-label="Anmelden oder registrieren">
+        <button type="button" class="on" data-mode="login" role="tab" aria-selected="true">Anmelden</button>
+        <button type="button" data-mode="register" role="tab" aria-selected="false">Neues Konto</button>
+      </div>
+
+      <div class="ps-auth-tabs" id="roles" data-role="listener" role="group" aria-label="Kontotyp wählen">
+        <span class="pill" aria-hidden="true"></span>
+        <button type="button" id="ps-role-private" class="ps-auth-tab active" data-role="listener" aria-pressed="true"><span class="ri">🎧</span><span><strong>Hörer</strong><small>Musik genießen</small></span></button>
+        <button type="button" id="ps-role-artist" class="ps-auth-tab" data-role="artist" aria-pressed="false"><span class="ri">🎤</span><span><strong>Künstler</strong><small>Musik veröffentlichen</small></span></button>
+      </div>
+      <p id="ps-auth-role-hint" class="ps-auth-hint">Deine Musik entdecken, Lieblingssongs speichern und Playlists erstellen.</p>
+
+      <form id="auth-form" novalidate>
+        <div class="field" id="f-email">
+          <input id="email" type="email" placeholder=" " autocomplete="email" inputmode="email">
+          <label for="email">E-Mail-Adresse</label>
+          <svg class="ok" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>
+        </div>
+        <p class="err">Bitte gib eine gültige E-Mail-Adresse ein.</p>
+
+        <div class="field" id="f-pass">
+          <input id="password" type="password" placeholder=" " autocomplete="current-password">
+          <label for="password">Passwort</label>
+          <button type="button" class="eye" id="eye" aria-label="Passwort anzeigen" aria-pressed="false"></button>
+        </div>
+        <p class="err">Das Passwort braucht mindestens 12 Zeichen.</p>
+        <div class="strength register-only" id="strength" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="strength-text register-only"><span id="s-label">Mindestens 12 Zeichen</span><span id="s-count">0 / 12</span></div>
+
+        <div class="row login-only"><span></span><button type="button" id="ps-recovery-open" class="link">Passwort vergessen?</button></div>
+        <div class="row register-only" style="justify-content:flex-start">
+          <label class="check"><input type="checkbox" id="terms"> <span>Ich habe die <a class="link" href="datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a> gelesen.</span></label>
+        </div>
+
+        <button id="login" class="submit login-only" type="button">Anmelden</button>
+        <button id="register" class="submit register-only" type="button">Privatkonto registrieren</button>
+        <p class="local-msg" id="local-msg" role="alert"></p>
+      </form>
+
+      <div class="or">oder</div>
+      <div class="alt login-only"><span>Noch kein Konto?</span><button type="button" data-switch="register">Jetzt kostenlos registrieren</button></div>
+      <div class="alt register-only"><span>Schon ein Konto?</span><button type="button" data-switch="login">Hier anmelden</button></div>
+    </div>
+
+    <div class="ps-recovery-help recovery-only">
+      <div id="ps-recovery-form" hidden>
+        <div class="field" id="f-recovery">
+          <input id="ps-recovery-email" type="email" placeholder=" " autocomplete="email" inputmode="email">
+          <label for="ps-recovery-email">E-Mail-Adresse</label>
+          <svg class="ok" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>
+        </div>
+        <button id="ps-recovery-send" class="submit" type="button">Link zum Zurücksetzen senden</button>
+        <p id="ps-recovery-status" role="status"></p>
+      </div>
+    </div>
+
+    <div id="account" class="hidden">
+      <h2>Mein Konto</h2>
+      <a class="submit" href="index.html" id="account-home">▶ Zur Musik-Startseite</a>
+      <p id="who"></p>
+      <label for="new-password">Neues Passwort</label>
+      <input id="new-password" type="password" minlength="12" autocomplete="new-password">
+      <button id="change-password" class="ghost" type="button">Passwort ändern</button>
+      <button id="logout" class="ghost" type="button">Abmelden</button>
+    </div>
+
+    <p id="status" role="status"></p>
+  </section>
+
+  <nav class="foot"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
+</main>
+
+<script src="cloud.js?v=authfix-1"></script>
+<script src="support-widget.js?v=1"></script>
+<script src="listener.js?v=enter-login-1"></script>
+<script>
+/* Nur Darstellung und Bedienkomfort. Anmelden, Registrieren und
+   Passwort-Zurücksetzen übernimmt unverändert listener.js. */
+(()=>{'use strict';
+const $=id=>document.getElementById(id),card=$('card'),root=document.documentElement.style;
+let mode='login';
+const ROLE={
+  listener:{c1:'#8b6cf6',c2:'#e0569f',perks:[['🎧','Musik hören, so viel du willst'],['💜','Lieblingssongs & Playlists'],['🔥','Songs bewerten']],
+    title:{login:'Willkommen zurück',register:'Leg los – kostenlos'},sub:{login:'Melde dich an und hör weiter, wo du aufgehört hast.',register:'In einer Minute ist dein Konto bereit.'}},
+  artist:{c1:'#ff7a59',c2:'#e0569f',perks:[['🎤','Eigene Musik veröffentlichen'],['📈','Streams & Reaktionen sehen'],['✨','Eigenes Künstlerprofil']],
+    title:{login:'Willkommen zurück',register:'Werde Teil der Bühne'},sub:{login:'Melde dich an und öffne dein Künstlerstudio.',register:'Erstelle dein Künstlerkonto und veröffentliche deine Musik.'}}
+};
+const role=()=>document.querySelector('.ps-auth-tab.active')?.dataset.role||'listener';
+function paint(){
+  const r=ROLE[role()];card.dataset.mode=mode;$('roles').dataset.role=role();
+  root.setProperty('--c1',r.c1);root.setProperty('--c2',r.c2);
+  $('title').textContent=r.title[mode];$('subtitle').textContent=r.sub[mode];
+  $('perks').innerHTML=r.perks.map(p=>'<div class="perk"><i>'+p[0]+'</i>'+p[1]+'</div>').join('');
+  document.querySelectorAll('.mode button').forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle('on',on);b.setAttribute('aria-selected',String(on))});
+  $('password').autocomplete=mode==='register'?'new-password':'current-password';
+  $('local-msg').textContent='';$('status').textContent='';checkPass();
+}
+document.addEventListener('click',e=>{
+  const m=e.target.closest('.mode button,[data-switch]');if(m){mode=m.dataset.mode||m.dataset.switch;paint()}
+});
+// listener.js setzt "active" auf den Kontotyp – danach Farben & Texte anpassen
+document.querySelectorAll('.ps-auth-tab').forEach(b=>b.addEventListener('click',()=>setTimeout(paint)));
+
+// Prüfen beim Tippen
+const validMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+const mark=(f,ok,bad)=>{$(f).classList.toggle('good',ok);$(f).classList.toggle('bad',bad)};
+for(const [inp,f] of [['email','f-email'],['ps-recovery-email','f-recovery']]){
+  $(inp).addEventListener('input',e=>mark(f,validMail(e.target.value.trim()),false));
+  $(inp).addEventListener('blur',e=>{const v=e.target.value.trim();if(v)mark(f,validMail(v),!validMail(v))});
+}
+function checkPass(){
+  const v=$('password').value,len=v.length;let s=0;
+  if(len>=12)s++;if(/[A-Z]/.test(v)&&/[a-z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^A-Za-z0-9]/.test(v)||len>=16)s++;if(len<12)s=Math.min(s,1);
+  const cols=['#ff7a8a','#ffc46b','#a78bfa','#5eead4'],labels=['Noch zu kurz','Okay','Gut','Stark 💪'];
+  document.querySelectorAll('#strength i').forEach((b,i)=>b.style.background=i<s?cols[s-1]:'');
+  $('s-label').textContent=len?(len<12?'Noch '+(12-len)+' Zeichen':labels[s-1]):'Mindestens 12 Zeichen';
+  $('s-count').textContent=Math.min(len,12)+' / 12';
+  if(mode==='register')mark('f-pass',len>=12,false);else $('f-pass').classList.remove('good');
+}
+$('password').addEventListener('input',()=>{$('f-pass').classList.remove('bad');checkPass()});
+
+// Passwort anzeigen
+const EYE='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+$('eye').innerHTML=EYE;
+$('eye').onclick=()=>{const p=$('password'),show=p.type==='password';p.type=show?'text':'password';$('eye').innerHTML=show?EYE_OFF:EYE;$('eye').setAttribute('aria-label',show?'Passwort verbergen':'Passwort anzeigen');$('eye').setAttribute('aria-pressed',String(show))};
+
+// Vor dem Absenden prüfen; Enter löst die oben gewählte Aktion aus
+function shake(){card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake')}
+function precheck(){
+  const mail=$('email').value.trim(),pw=$('password').value;let ok=true;$('local-msg').textContent='';
+  if(!validMail(mail)){mark('f-email',false,true);ok=false}
+  if(pw.length<12){$('f-pass').classList.add('bad');ok=false}
+  if(ok&&mode==='register'&&!$('terms').checked){$('local-msg').textContent='Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.';ok=false}
+  if(!ok)shake();return ok;
+}
+for(const id of ['login','register'])$(id).addEventListener('click',e=>{if(!precheck()){e.stopImmediatePropagation();e.preventDefault()}},true);
+$('auth-form').addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.isComposing||!e.target.matches('#email,#password'))return;
+  e.preventDefault();e.stopPropagation();$(mode==='register'?'register':'login').click();
+},true);
+$('auth-form').addEventListener('submit',e=>e.preventDefault());
+
+// Rückmeldung aus listener.js: Fehler wackeln, Hinweise ruhig anzeigen
+const st=$('status');
+new MutationObserver(()=>{let t=st.textContent;
+  if(/wartet noch auf eine E-Mail-Bestätigung/i.test(t)){t='📬 Fast geschafft! Bitte bestätige deine E-Mail-Adresse über den Link, den wir dir geschickt haben. Danach kannst du dich hier anmelden.';st.textContent=t;return}
+  const info=/bestätig|geändert/i.test(t);st.classList.toggle('info',info);if(t&&!info)shake()}).observe(st,{childList:true,characterData:true,subtree:true});
+
+// Passwort vergessen als eigene Ansicht
+const recForm=$('ps-recovery-form');
+new MutationObserver(()=>{card.classList.toggle('recovery',!recForm.hidden);st.textContent=''}).observe(recForm,{attributes:true,attributeFilter:['hidden']});
+$('recovery-back').onclick=()=>{if(!recForm.hidden)$('ps-recovery-open').click()};
+
+
+// Wellenform & Partikel
+$('wave').innerHTML=Array.from({length:22},(_,i)=>'<span style="animation-delay:'+(-(i*.11)%1.2)+'s;animation-duration:'+(.9+(i%5)*.18)+'s"></span>').join('');
+const pc=$('particles'),px=pc.getContext('2d');let parts=[],W=0,H=0,ptr={x:-999,y:-999};
+function size(){const d=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;pc.width=W*d;pc.height=H*d;px.setTransform(d,0,0,d,0,0);
+  parts=Array.from({length:Math.min(110,Math.round(W/10))},()=>({x:Math.random()*W,y:Math.random()*H,r:.6+Math.random()*2,s:.15+Math.random()*.45,o:.15+Math.random()*.55,h:Math.random()<.5}))}
+size();addEventListener('resize',size,{passive:true});addEventListener('pointermove',e=>ptr={x:e.clientX,y:e.clientY},{passive:true});
+function frame(){requestAnimationFrame(frame);if(document.hidden)return;const cs=getComputedStyle(document.documentElement),c1=cs.getPropertyValue('--c1').trim(),c2=cs.getPropertyValue('--c2').trim();px.clearRect(0,0,W,H);
+  for(const p of parts){p.y-=p.s;p.x+=Math.sin(p.y/50)*.2;const dx=p.x-ptr.x,dy=p.y-ptr.y,dd=dx*dx+dy*dy;if(dd<8100){const f=(8100-dd)/8100*2,m=Math.sqrt(dd+1);p.x+=dx/m*f;p.y+=dy/m*f}
+    if(p.y<-5){p.y=H+5;p.x=Math.random()*W}px.globalAlpha=p.o;px.fillStyle=p.h?c1:c2;px.beginPath();px.arc(p.x,p.y,p.r,0,6.283);px.fill()}}
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(frame);
+paint();
+})();
+</script>
+</body>
+</html>

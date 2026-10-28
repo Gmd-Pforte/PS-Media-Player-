@@ -182,6 +182,62 @@ function buildProfilePreview(){
 }
 if(profBody)new MutationObserver(buildProfilePreview).observe(profBody,{childList:true});
 
+/* ---------- Teilen ---------- */
+const SHARE_ICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>';
+const baseUrl=()=>location.href.split(/[?#]/)[0].replace(/[^/]*$/,'');
+let toastTimer;
+function toast(msg){let t=$('psl-toast');if(!t){t=d.createElement('div');t.id='psl-toast';t.className='psl-toast';t.setAttribute('role','status');d.body.append(t)}t.textContent=msg;t.classList.add('psl-show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('psl-show'),2200)}
+async function share({title,text,url}){
+  if(navigator.share){try{await navigator.share({title,text,url});return}catch(e){if(e?.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(url);toast('Link kopiert ✓ – jetzt einfach einfügen')}catch{window.prompt('Link zum Teilen kopieren:',url)}
+}
+window.pslShare=share;window.pslColorsFrom=extractColors;
+const songsList=()=>{try{return typeof allSongs==='function'?allSongs():[]}catch{return []}};
+function shareSong(key){const s=songsList().find(x=>x.key===key);if(!s)return;share({title:s.title+' · '+(s.artist||'PS MUSIC STREAM'),text:'„'+s.title+'“ von '+(s.artist||'PS AI MUSIC')+' – hör mal rein 🎧',url:baseUrl()+'song.html?id='+encodeURIComponent(key)})}
+function shareBtn(cls,label){const b=d.createElement('button');b.type='button';b.className=cls;b.innerHTML=SHARE_ICO;b.setAttribute('aria-label',label);b.title=label;return b}
+function addRowShares(box){box.querySelectorAll('.ps-song-row').forEach(row=>{if(row.querySelector('.psl-share'))return;const key=row.querySelector('[data-song]')?.dataset.song;if(!key)return;const b=shareBtn('btn secondary small psl-share','Song teilen');b.dataset.pslShare=key;row.append(b)})}
+for(const id of ['songs','albumtracks']){const box=$(id);if(box){new MutationObserver(()=>addRowShares(box)).observe(box,{childList:true});addRowShares(box)}}
+d.addEventListener('click',e=>{const b=e.target.closest('[data-psl-share]');if(b){e.stopPropagation();shareSong(b.dataset.pslShare)}},true);
+// Vollplayer
+const pActions=d.querySelector('#ps-audio-panel>.actions');
+if(pActions){const b=d.createElement('button');b.type='button';b.className='btn secondary small';b.id='psl-share-current';b.innerHTML=SHARE_ICO+'<span>Teilen</span>';b.onclick=()=>{const s=currentSong();if(s?.key)shareSong(s.key)};pActions.append(b)}
+// Albumansicht
+const aHead=$('albumhead');
+if(aHead)new MutationObserver(()=>{if(aHead.querySelector('.psl-album-share')||!aHead.children.length)return;
+  const b=d.createElement('button');b.type='button';b.className='btn secondary psl-album-share';b.innerHTML=SHARE_ICO+'<span>Teilen</span>';
+  b.onclick=()=>{try{const a=db.albums.find(x=>x.key===selected);if(!a?.tracks?.length)return;share({title:a.title+' · '+a.artist,text:'Das Album „'+a.title+'“ von '+a.artist+' – hör mal rein 🎧',url:baseUrl()+'song.html?id='+encodeURIComponent(a.tracks[0].key)+'&album=1'})}catch{}};
+  (aHead.querySelector('.ps-play-release')||aHead.lastElementChild).after(b)}).observe(aHead,{childList:true});
+// Künstlerprofil
+const playAll=$('psl-play-all');
+if(playAll){const b=d.createElement('button');b.type='button';b.className='btn secondary';b.id='psl-profile-share';b.innerHTML=SHARE_ICO+'<span>Profil teilen</span>';
+  b.onclick=()=>{const name=$('artistname')?.textContent||'Künstler';share({title:name+' · PS MUSIC STREAM',text:name+' auf PS MUSIC STREAM – hör mal rein 🎧',url:location.href})};playAll.after(b)}
+
+/* ---------- Geteilten Song nach dem Öffnen anbieten ---------- */
+(function openShared(){
+  if(!$('homeview'))return;
+  const q=new URLSearchParams(location.search);let id=q.get('song')||q.get('album'),album=q.has('album'),stored=null;
+  try{stored=JSON.parse(localStorage.getItem('psms_open_song')||'null')}catch{}
+  if(!id&&stored?.id&&Date.now()-(stored.ts||0)<36e5){id=stored.id;album=!!stored.album}
+  if(!id)return;
+  try{localStorage.removeItem('psms_open_song')}catch{}
+  if(q.has('song')||q.has('album'))history.replaceState(history.state,'',location.pathname+location.hash);
+  const started=Date.now();
+  (function wait(){
+    const s=songsList().find(x=>x.key===id),ready=d.body.classList.contains('psl-logged-in');
+    if(!s||!ready){if(Date.now()-started<30000)setTimeout(wait,500);return}
+    let a=null;try{a=db.albums.find(x=>x.tracks.some(t=>t.key===id))}catch{}
+    const card=d.createElement('div');card.className='psl-shared';card.setAttribute('role','dialog');card.setAttribute('aria-label','Geteilter Song');
+    const art=d.createElement('div');art.className='psl-shared-art';const src=s.cover_url||a?.cover;if(src&&/^https:/i.test(src)){const im=new Image();im.src=src;im.alt='';art.append(im)}else art.textContent='♫';
+    const txt=d.createElement('div');txt.className='psl-shared-txt';const k=d.createElement('small');k.textContent=album&&a?'💿 Album für dich geteilt':'🎧 Für dich geteilt';
+    const t=d.createElement('strong');t.textContent=album&&a?a.title:s.title;const ar=d.createElement('span');ar.textContent=s.artist||'';txt.append(k,t,ar);
+    const go=d.createElement('button');go.type='button';go.className='btn';go.textContent=album&&a?'Öffnen':'▶ Abspielen';
+    const x=d.createElement('button');x.type='button';x.className='psl-shared-x';x.textContent='✕';x.setAttribute('aria-label','Schließen');
+    card.append(art,txt,go,x);d.body.append(card);
+    const close=()=>{card.classList.add('psl-out');setTimeout(()=>card.remove(),350)};x.onclick=close;
+    go.onclick=()=>{close();$('open-home')?.click();const tmp=d.createElement('button');tmp.hidden=true;if(album&&a)tmp.dataset.album=a.key;else tmp.dataset.song=id;d.body.append(tmp);tmp.click();tmp.remove()};
+  })();
+})();
+
 /* ---------- Mini-Player: Tippen öffnet den Vollplayer ---------- */
 const expandBtn=$('expand');
 d.querySelector('.player .phead .info')?.addEventListener('click',()=>{if(!player.classList.contains('expanded'))expandBtn?.click()});

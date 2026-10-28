@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07060b">
+<title>Hör mal rein · PS MUSIC STREAM</title>
+<meta name="description" content="Ein Song für dich auf PS MUSIC STREAM – Musik aus echten Gefühlen. Jetzt reinhören.">
+<meta property="og:type" content="music.song">
+<meta property="og:site_name" content="PS MUSIC STREAM">
+<meta property="og:title" content="Ein Song für dich 🎧 · PS MUSIC STREAM">
+<meta property="og:description" content="Musik aus echten Gefühlen. Tippe zum Reinhören.">
+<meta property="og:image" content="https://gmd-pforte.github.io/PS-Media-Player-/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ps-live.css?v=5">
+<link rel="icon" href="ps-icon.svg?v=1" type="image/svg+xml">
+<link rel="apple-touch-icon" href="ps-icon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+body.psl-song .wrap{margin:0 auto;max-width:1080px;padding:0 18px 60px}
+body.psl-song .top{justify-content:space-between;margin:0 -18px;padding:14px 18px}
+body.psl-song .top .psl-logo{display:flex}
+.sg{display:grid;gap:30px;align-items:center;margin-top:10px}
+@media (min-width:860px){.sg{grid-template-columns:1fr 1fr;gap:56px;margin-top:40px}}
+.sg-art{position:relative;width:min(380px,78vw);aspect-ratio:1;margin:0 auto;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+body.psl-playing .sg-art{transform:translateX(-10%)}
+.sg-art .psl-vinyl{inset:4%}
+.sg-cover{position:relative;z-index:1;width:100%;height:100%;border-radius:26px;overflow:hidden;display:grid;place-items:center;font-size:80px;background:linear-gradient(135deg,var(--c1),var(--c2));
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.95),0 0 calc(30px + var(--beat)*70px) -10px var(--c1);transform:scale(calc(1 + var(--beat)*.03))}
+.sg-cover img{width:100%;height:100%;object-fit:cover}
+.sg-glow{position:absolute;inset:-14%;z-index:-1;border-radius:50%;background:radial-gradient(circle,var(--c1),transparent 65%);filter:blur(40px);opacity:calc(.45 + var(--beat)*.35)}
+.sg-info .eyebrow{margin-bottom:10px}
+.sg-info h1{font-size:clamp(38px,7vw,68px);line-height:.95;margin:6px 0 10px;overflow-wrap:anywhere}
+.sg-artist{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:800;font-size:16px}
+.sg-artist .av{width:34px;height:34px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--glow);font-size:14px}
+.sg-artist .av img{width:100%;height:100%;object-fit:cover}
+.sg-artist:hover{color:var(--violet)}
+.sg-player{display:flex;align-items:center;gap:16px;margin-top:26px;padding:14px;border-radius:24px;background:rgba(29,25,41,.75);backdrop-filter:blur(20px);border:1px solid var(--line-2)}
+.sg-play{position:relative;width:64px;height:64px;flex:none;border-radius:50%;background:#fff;color:#0b0910;display:grid;place-items:center;border:0;box-shadow:0 12px 30px -10px rgba(0,0,0,.6)}
+.sg-play svg{width:26px;height:26px}
+.sg-ring{position:absolute;inset:-6px;width:76px;height:76px;transform:rotate(-90deg);pointer-events:none}
+.sg-ring circle{fill:none;stroke:url(#sgGrad);stroke-width:3;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset .25s linear}
+.sg-meta{flex:1;min-width:0}
+.sg-meta strong{display:block;font-weight:800}
+.sg-meta small{font-weight:600;font-size:12.5px}
+.sg-bars{display:flex;align-items:center;gap:3px;height:34px;margin-top:6px}
+.sg-bars i{flex:1;max-width:5px;border-radius:3px;background:rgba(255,255,255,.25);height:30%;transition:height .1s,background .3s}
+body.psl-playing .sg-bars i{background:linear-gradient(var(--c1),var(--c2))}
+.sg-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.sg-cta .btn{height:52px;padding:0 24px}
+.sg-note{font-size:13px;color:var(--dim);margin-top:14px}
+.sg-tracks{margin-top:46px}
+.sg-tracks .list{background:rgba(21,18,30,.7);border:1px solid var(--line);border-radius:var(--r-lg);padding:8px}
+.sg-track{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:14px;transition:background .2s}
+.sg-track:hover{background:rgba(255,255,255,.05)}
+.sg-track .n{width:22px;text-align:center;font:800 14px var(--display);color:var(--dim)}
+.sg-track .t{flex:1;min-width:0}
+.sg-track .t strong{display:block;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-track .t small{font-size:12px;font-weight:600}
+.sg-track button{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:var(--text);display:grid;place-items:center}
+.sg-track button:disabled{opacity:.3}
+.sg-track.on{background:linear-gradient(90deg,rgba(167,139,250,.16),transparent 75%)}
+.sg-track.on strong{color:var(--violet)}
+.sg-error{text-align:center;margin:80px auto;max-width:420px}
+.sg-error h1{font-size:34px;margin-bottom:10px}
+.sg-loading{display:grid;place-items:center;min-height:50vh;color:var(--muted)}
+</style>
+</head>
+<body class="psl psl-song">
+<div id="psl-ambient" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="sgGrad" x1="0" x2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#e0569f"/><stop offset="1" stop-color="#8b6cf6"/></linearGradient></defs></svg>
+<main class="wrap">
+  <header class="top">
+    <a class="psl-logo" href="index.html" style="text-decoration:none;color:inherit"><div class="psl-logo-mark">PS</div><div class="psl-logo-text">Music Stream<small>MUSIK AUS ECHTEN GEFÜHLEN</small></div></a>
+    <button type="button" class="btn secondary small" id="sg-share">Teilen</button>
+  </header>
+  <div id="sg-root"><div class="sg-loading">Song wird geladen …</div></div>
+  <div class="ps-legal-links"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></div>
+</main>
+<audio id="ps-audio" preload="none"></audio>
+<aside id="player" hidden></aside>
+
+<script src="cloud.js?v=authfix-1"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),root=$('sg-root'),audio=$('ps-audio');
+const q=new URLSearchParams(location.search),songId=q.get('id')||'',albumMode=q.get('album')==='1';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safe=u=>{try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return ''}};
+const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
+const PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>';
+const loggedIn=()=>{try{return !!JSON.parse(localStorage.getItem('psms_listener_session')||'null')?.access_token}catch{return false}};
+let tracks=[],current=null;
+
+async function fetchSongs(filter){
+  const base='id,title,cover_url,album_title,owner_id,track_position,psms_artists(artist_name,logo_url)';
+  try{return await request('psms_artist_songs?select='+base+',preview_url,preview_start&hidden=eq.false&'+filter)}
+  catch(e){return await request('psms_artist_songs?select='+base+'&hidden=eq.false&'+filter)}
+}
+function fail(title,text){root.innerHTML='<div class="sg-error"><div class="ps-gate-symbol" style="margin:0 auto 18px">♫</div><h1>'+esc(title)+'</h1><p>'+esc(text)+'</p><a class="btn" href="index.html" style="margin-top:14px">Musik entdecken</a></div>'}
+
+async function init(){
+  if(!/^[0-9a-f-]{36}$/i.test(songId))return fail('Link unvollständig','Dieser Link enthält keinen gültigen Song.');
+  const rows=await fetchSongs('id=eq.'+encodeURIComponent(songId));
+  const song=rows?.[0];if(!song)return fail('Song nicht gefunden','Dieser Song ist nicht mehr verfügbar.');
+  tracks=[song];
+  if(albumMode&&song.album_title){
+    const all=await fetchSongs('owner_id=eq.'+encodeURIComponent(song.owner_id)+'&album_title=eq.'+encodeURIComponent(song.album_title)+'&order=track_position.asc.nullslast,created_at.asc');
+    if(all?.length)tracks=all;
+  }
+  const artist=song.psms_artists?.artist_name||'Künstler',logo=safe(song.psms_artists?.logo_url),cover=safe(song.cover_url)||logo;
+  const isAlbum=albumMode&&tracks.length>1,title=isAlbum?song.album_title:song.title;
+  document.title=title+' · '+artist+' · PS MUSIC STREAM';
+  const fullHref=loggedIn()?'index.html?'+(isAlbum?'album':'song')+'='+encodeURIComponent(song.id):'#';
+  root.innerHTML='<section class="sg">'
+   +'<div class="sg-art"><div class="sg-glow"></div><div class="psl-vinyl" aria-hidden="true"><div class="psl-vinyl-spin"><div class="psl-vinyl-label">'+(cover?'<img src="'+esc(cover)+'" alt="">':'')+'</div></div></div>'
+   +'<div class="sg-cover">'+(cover?'<img id="sg-cover-img" src="'+esc(cover)+'" alt="Cover" crossorigin="anonymous">':'♫')+'</div></div>'
+   +'<div class="sg-info"><span class="eyebrow">'+(isAlbum?'ALBUM · '+tracks.length+' SONGS':'FÜR DICH GETEILT')+'</span><h1>'+esc(title)+'</h1>'
+   +'<a class="sg-artist" href="profile.html?id='+encodeURIComponent(song.owner_id)+'"><span class="av">'+(logo?'<img src="'+esc(logo)+'" alt="">':'♫')+'</span>'+esc(artist)+'</a>'
+   +'<div class="sg-player"><button class="sg-play" id="sg-play" type="button" aria-label="Hörprobe abspielen"><svg class="sg-ring" viewBox="0 0 76 76"><circle cx="38" cy="38" r="35" id="sg-ring"/></svg><span id="sg-ico">'+PLAY+'</span></button>'
+   +'<div class="sg-meta"><strong id="sg-now"></strong><small id="sg-sub"></small><div class="sg-bars" id="sg-bars">'+'<i></i>'.repeat(28)+'</div></div></div>'
+   +'<div class="sg-cta"><a class="btn" id="sg-full" href="'+fullHref+'">'+(loggedIn()?'▶ Ganzen Song hören':'Kostenlos anmelden & ganz hören')+'</a></div>'
+   +'<p class="sg-note">'+(loggedIn()?'Du bist angemeldet und hörst gleich die volle Version.':'Ohne Konto hörst du eine 30-Sekunden-Hörprobe. Mit dem kostenlosen Konto hörst du alles.')+'</p></div></section>'
+   +(isAlbum?'<section class="sg-tracks"><div class="ps-section-heading"><div><div class="ps-section-kicker">TRACKLISTE</div><h2>Alle Songs</h2></div></div><div class="list" id="sg-list"></div></section>':'');
+  if(isAlbum){$('sg-list').innerHTML=tracks.map((t,i)=>'<div class="sg-track" data-i="'+i+'"><span class="n">'+(i+1)+'</span><div class="t"><strong>'+esc(t.title)+'</strong><small>'+(t.preview_url?'Hörprobe · 30 Sek.':'Hörprobe folgt')+'</small></div><button type="button" aria-label="Hörprobe abspielen" '+(t.preview_url?'':'disabled')+'>'+PLAY+'</button></div>').join('');
+    $('sg-list').onclick=e=>{const r=e.target.closest('.sg-track');if(r&&tracks[r.dataset.i].preview_url)select(tracks[r.dataset.i],true)}}
+  $('sg-full').onclick=e=>{if(loggedIn())return;e.preventDefault();try{localStorage.setItem('psms_open_song',JSON.stringify({id:song.id,album:isAlbum,ts:Date.now()}))}catch{}location.href='listener.html'};
+  $('sg-play').onclick=()=>{if(!current?.preview_url){$('sg-sub').textContent='Für diesen Song gibt es noch keine Hörprobe.';return}audio.paused?audio.play().catch(()=>{}):audio.pause()};
+  $('sg-share').onclick=()=>window.pslShare?.({title,text:'„'+title+'“ von '+artist+' – hör mal rein 🎧',url:location.href});
+  select(tracks.find(t=>t.id===song.id&&t.preview_url)||tracks.find(t=>t.preview_url)||song,false);
+  if(cover)setTimeout(()=>window.pslColorsFrom?.(cover),60);
+}
+function select(t,autoplay){
+  current=t;$('sg-now').textContent=t.title;
+  $('sg-sub').textContent=t.preview_url?'Hörprobe · 30 Sekunden':'Hörprobe folgt in Kürze';
+  document.querySelectorAll('.sg-track').forEach((r,i)=>r.classList.toggle('on',tracks[i]===t));
+  if(t.preview_url){audio.src=t.preview_url;audio.preload='metadata';if(autoplay)audio.play().catch(()=>{})}
+  $('ptitle')&&($('ptitle').textContent=t.title);
+}
+audio.addEventListener('play',()=>{$('sg-ico').innerHTML=PAUSE});
+audio.addEventListener('pause',()=>{$('sg-ico').innerHTML=PLAY});
+audio.addEventListener('ended',()=>{$('sg-ico').innerHTML=PLAY;$('sg-ring').style.strokeDashoffset=220});
+audio.addEventListener('timeupdate',()=>{const d=audio.duration||30;$('sg-ring').style.strokeDashoffset=String(220-220*Math.min(1,audio.currentTime/d))});
+(function bars(){requestAnimationFrame(bars);const b=document.querySelectorAll('#sg-bars i');if(!b.length)return;const now=performance.now(),beat=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--beat'))||0;
+  b.forEach((x,i)=>x.style.height=audio.paused?(20+Math.abs(Math.sin(i*.7))*25)+'%':(18+Math.abs(Math.sin(now/(160+i*17)+i))*55*(.5+beat)+beat*25)+'%')})();
+init().catch(e=>fail('Etwas ist schiefgelaufen',e.message));
+})();
+</script>
+<script defer src="ps-live.js?v=5"></script>
+</body>
+</html>

@@ -837,3 +837,8 @@ body:not(.psl-artist-zone) #psl-tabbar .psl-tab-a{display:none}
 .ps-internal-profile-bar strong{font-size:15px}.ps-internal-profile-bar button{padding:10px 16px;background:#2a2240;border:1px solid rgba(194,174,236,.35);border-radius:12px;color:#fff;font:inherit;cursor:pointer}
 .ps-internal-profile iframe{border:0;display:block;width:100%;flex:1;min-height:0;background:#080710}
 @media(max-width:979.98px){.ps-internal-profile{bottom:calc(138px + env(safe-area-inset-bottom,0px))}.ps-internal-profile-bar{min-height:52px;padding:6px 12px}}
+
+/* Künstlerstudio: unverbindliche virtuelle Euro-Vorschau */
+.ps-virtual-revenue{border:1px solid rgba(146,208,173,.34);background:linear-gradient(130deg,rgba(27,81,65,.22),rgba(53,33,82,.15));margin:18px 0;padding:23px;border-radius:20px}
+.ps-virtual-revenue-value{display:block;font-size:clamp(28px,5vw,46px);font-weight:850;letter-spacing:-.035em;color:#a6efd1;margin:12px 0}
+.ps-virtual-revenue .ps-stats-desc{max-width:750px;line-height:1.55}

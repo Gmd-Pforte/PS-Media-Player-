@@ -839,3 +839,5 @@ body.ps-liquid-live img,body.ps-liquid-live video,body.ps-liquid-live canvas:not
 .ps-release-editor-track input{width:100%;min-width:0;background:#0e1422;color:white;border:1px solid #536178;border-radius:9px;padding:11px}
 .ps-release-editor-order{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.ps-release-editor-actions{display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
 @media(max-width:610px){.ps-release-editor-panel{padding:16px}.ps-release-editor-track{grid-template-columns:1fr}}
+
+.ps-admin-song-editor{display:flex;flex-direction:column;gap:16px;max-width:660px}.ps-admin-song-editor label{display:flex;flex-direction:column;gap:7px;font-weight:650}.ps-admin-song-editor input{width:100%;padding:12px;border-radius:9px;color:#f6f8fa;background:#101a1c;border:1px solid #4b615a}.ps-admin-song-editor button{align-self:flex-start}

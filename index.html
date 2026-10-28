@@ -299,6 +299,36 @@
 <script src="ps-image-editor.js?v=1"></script>
 <script src="ps-preview.js?v=2"></script>
 <script src="unified.js?v=release-type-global-1"></script>
+<script>
+/* Künstlerprofile intern öffnen, damit der Musikplayer nicht neu geladen wird. */
+(()=>{
+ let overlay=null,frame=null,returnFocus=null;
+ function close(){if(!overlay)return;overlay.remove();overlay=null;frame=null;document.body.classList.remove('ps-profile-open');returnFocus?.focus?.()}
+ function open(url){
+   close();returnFocus=document.activeElement;
+   overlay=document.createElement('section');overlay.className='ps-internal-profile';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-label','Künstlerprofil');overlay.setAttribute('aria-modal','true');
+   const bar=document.createElement('div');bar.className='ps-internal-profile-bar';
+   const label=document.createElement('strong');label.textContent='Künstlerprofil';
+   const back=document.createElement('button');back.type='button';back.textContent='← Zur Musik';back.setAttribute('aria-label','Künstlerprofil schließen');back.onclick=close;
+   bar.append(label,back);frame=document.createElement('iframe');frame.title='Künstlerprofil';frame.src=url.href;frame.loading='eager';
+   frame.addEventListener('load',()=>{
+     try{
+       frame.contentDocument.querySelectorAll('a[href="index.html"],a[href="./index.html"]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();close()}));
+       const innerAudio=frame.contentDocument.getElementById('profile-audio');
+       innerAudio?.addEventListener('play',()=>document.getElementById('ps-audio')?.pause());
+     }catch(e){console.warn('Profil-Navigation:',e)}
+   });
+   overlay.append(bar,frame);document.body.append(overlay);document.body.classList.add('ps-profile-open');back.focus();
+ }
+ document.addEventListener('click',event=>{
+   const link=event.target.closest('a[href]');if(!link||event.defaultPrevented||event.button!==0||event.ctrlKey||event.shiftKey||event.metaKey||event.altKey||link.target&&link.target!=='_self')return;
+   let url;try{url=new URL(link.href,location.href)}catch{return}
+   if(url.origin!==location.origin||!url.pathname.endsWith('/profile.html')||!url.searchParams.has('id'))return;
+   event.preventDefault();open(url);
+ },true);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay)close()});
+})();
+</script>
 <script defer src="ps-live.js?v=5"></script>
 </body>
 </html>

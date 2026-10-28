@@ -819,3 +819,14 @@ body:not(.psl-artist-zone) #psl-tabbar .psl-tab-a{display:none}
 .psl-pv-times strong{color:var(--text)}
 .psl-pv-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 .psl-pv-status{font-size:13px;margin-top:12px;color:var(--muted)}
+
+
+/* Search dropdown for the current PS MUSIC STREAM design */
+.ps-header-search{position:relative;z-index:60}
+#ps-search-suggestions{position:absolute;top:calc(100% + 10px);left:0;right:0;z-index:9999;box-sizing:border-box;max-height:min(62dvh,520px);overflow-y:auto;overscroll-behavior:contain;padding:11px;border-radius:20px;border:1px solid rgba(175,163,221,.28);background:rgba(19,17,32,.98);box-shadow:0 22px 65px rgba(0,0,0,.66);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);color:#f5f2ff}
+#ps-search-suggestions[hidden]{display:none!important}
+#ps-search-suggestions .ps-search-suggestion-heading{font:700 10px/1.6 inherit;letter-spacing:.16em;text-transform:uppercase;color:#b8a4ed;padding:11px 12px 5px}
+#ps-search-suggestions .ps-search-suggestion-item{display:flex;align-items:center;width:100%;box-sizing:border-box;min-height:46px;margin:2px 0;padding:11px 13px;border:0;border-radius:12px;background:transparent!important;box-shadow:none!important;color:#f7f2ff!important;font:500 14px/1.45 inherit;text-align:left;text-decoration:none!important;white-space:normal;overflow-wrap:anywhere;cursor:pointer;appearance:none;-webkit-appearance:none}
+#ps-search-suggestions .ps-search-suggestion-item:hover,#ps-search-suggestions .ps-search-suggestion-item:focus-visible{background:rgba(154,112,221,.22)!important;outline:1px solid rgba(191,151,255,.6);outline-offset:-1px}
+#ps-search-suggestions .ps-search-suggestion-empty{padding:12px;color:#aeb0c7;font-size:13px}
+@media(max-width:979.98px){.ps-header-search{z-index:65}#ps-search-suggestions{width:100%;max-height:min(52dvh,430px);border-radius:17px}}

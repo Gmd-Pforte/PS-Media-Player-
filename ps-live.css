@@ -712,3 +712,65 @@ body.psl-playing .psl-eq i:nth-child(4){height:calc(65% - var(--beat)*30%)}
 #profile-prev{--psl-i:var(--psl-i-prev)}#profile-next{--psl-i:var(--psl-i-next)}#profile-play{--psl-i:var(--psl-i-play)}
 body.psl-playing #profile-play{--psl-i:var(--psl-i-pause)}
 .profile-player-ui .notice{margin:0;font-size:12px;text-align:right}
+
+/* =====================================================================
+   Künstlerbereich – Ausbau (Schnellzugriff, Plus-Knopf, Ablageflächen,
+   Profil-Vorschau)
+   ===================================================================== */
+.ps-dashboard-metrics small::before{margin-right:6px}
+[data-psl-ico=streams] small::before{content:"🎧"}
+[data-psl-ico=songs] small::before{content:"♫"}
+[data-psl-ico=releases] small::before{content:"💿"}
+.ps-stats-metric[data-icon=headphones] .ps-stats-label::before{content:"🎧 "}
+.ps-stats-metric[data-icon=music-2] .ps-stats-label::before{content:"♫ "}
+.ps-stats-metric[data-icon=heart] .ps-stats-label::before{content:"❤️ "}
+.ps-stats-metric[data-icon=flame] .ps-stats-label::before{content:"🔥 "}
+
+.psl-quick{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+@media (min-width:760px){.psl-quick{grid-template-columns:repeat(4,1fr)}}
+.psl-quick button{text-align:left;padding:18px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--line);color:var(--text);transition:transform .25s,border-color .25s,background .25s}
+.psl-quick button:hover{transform:translateY(-3px);border-color:var(--line-2);background:var(--surface-2)}
+.psl-quick button:active{transform:scale(.97)}
+.psl-qi{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;margin-bottom:14px;color:var(--q);background:color-mix(in srgb,var(--q) 16%,transparent)}
+.psl-qi svg{width:21px;height:21px}
+.psl-quick strong{display:block;font-weight:800}
+.psl-quick small{font-size:12.5px;font-weight:600}
+
+/* Tab-Leiste: Hörer- oder Künstler-Satz */
+body.psl-artist-zone #psl-tabbar .psl-tab-l{display:none}
+body:not(.psl-artist-zone) #psl-tabbar .psl-tab-a{display:none}
+#psl-tabbar .psl-tab-plus{width:54px;height:54px;min-width:0;padding:0;margin-top:-26px;border-radius:18px;background:var(--glow);color:#fff;display:grid;place-items:center;
+  box-shadow:0 12px 28px -8px rgba(224,86,159,.95);transition:transform .2s}
+#psl-tabbar .psl-tab-plus:active{transform:scale(.92)}
+#psl-tabbar .psl-tab-plus svg{width:26px;height:26px}
+#psl-tabbar .psl-tab-plus::after{display:none}
+
+/* Ablageflächen für Dateien */
+.psl-drop{position:relative;display:flex;align-items:center;gap:14px;margin:10px 0;padding:14px 16px;border-radius:18px;cursor:pointer;
+  border:1.5px dashed rgba(167,139,250,.45);background:rgba(139,108,246,.06);transition:background .2s,border-color .2s,transform .2s}
+.psl-drop:hover,.psl-drop.psl-over{background:rgba(139,108,246,.13);border-color:var(--violet)}
+.psl-drop.psl-over{transform:scale(1.01)}
+.psl-drop input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;padding:0;border:0}
+.psl-drop-ico{width:46px;height:46px;flex:none;border-radius:15px;display:grid;place-items:center;background:var(--glow);color:#fff;box-shadow:0 10px 24px -10px rgba(224,86,159,.9)}
+.psl-drop-ico svg{width:22px;height:22px}
+.psl-drop-txt strong{display:block;font-weight:800}
+.psl-drop-txt small{display:block;font-size:12.5px;font-weight:600}
+.psl-drop-big{flex-direction:column;text-align:center;padding:30px 18px;gap:12px}
+.psl-drop-big .psl-drop-ico{width:60px;height:60px;border-radius:19px}
+.psl-drop-big .psl-drop-ico svg{width:28px;height:28px}
+.psl-drop-big .psl-drop-txt strong{font:800 18px var(--display)}
+#ps-upload-step-content>p:first-child{font-size:13px;color:var(--dim)}
+#ps-upload-step-content>label{margin-top:16px}
+
+/* Profil-Vorschau */
+.psl-pp{border-radius:var(--r-xl);overflow:hidden;background:var(--surface);border:1px solid var(--line);margin-bottom:16px}
+.psl-pp-banner{height:clamp(130px,26vw,220px);background:linear-gradient(120deg,#2b1747,#5b2d6e 50%,#b34a6a) center/cover no-repeat;position:relative}
+.psl-pp-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(21,18,30,.9))}
+.psl-pp-body{display:flex;align-items:flex-end;gap:16px;padding:0 20px;margin-top:-46px;position:relative}
+.psl-pp-logo{width:104px;height:104px;flex:none;border-radius:50%;padding:4px;background:conic-gradient(from 0deg,#ff7a59,#e0569f,#8b6cf6,#ff7a59)}
+.psl-pp-logo>div{width:100%;height:100%;border-radius:50%;overflow:hidden;border:4px solid var(--surface);background:#2b2340;display:grid;place-items:center;font:800 30px var(--display)}
+.psl-pp-logo img{width:100%;height:100%;object-fit:cover}
+.psl-pp-who{min-width:0;padding-bottom:8px}
+.psl-pp-who h2{font-size:clamp(24px,4vw,32px);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psl-pp-bio{padding:12px 20px 20px;margin:0;white-space:pre-line;max-width:640px}
+.psl-has-preview .ps-unified-profile-form>div img{display:none}

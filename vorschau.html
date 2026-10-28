@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="ps-live.css?v=2">
+<link rel="stylesheet" href="ps-live.css?v=3">
 <link rel="icon" href="ps-icon.svg?v=1" type="image/svg+xml">
 <link rel="apple-touch-icon" href="ps-icon.svg">
 <link rel="manifest" href="manifest.webmanifest">
@@ -54,7 +54,7 @@
       <div class="ps-gate-symbol" aria-hidden="true">♫</div>
       <h1>Deine Musik wartet.</h1>
       <p>Melde dich kostenlos an, um Songs abzuspielen, Künstler zu entdecken und Playlists zu erstellen.</p>
-      <a class="btn" href="listener.html">Jetzt anmelden oder registrieren →</a>
+      <a class="btn" href="anmeldung-vorschau.html">Jetzt anmelden oder registrieren →</a>
     </div>
   </section>
 
@@ -155,6 +155,12 @@
         <div data-psl-ico="songs"><small>Eigene Songs</small><strong id="ps-dashboard-song-count">Wird geladen …</strong></div>
         <div data-psl-ico="releases"><small>Veröffentlichungen</small><strong id="ps-dashboard-release-count">Wird geladen …</strong></div>
       </div>
+      <div class="psl-quick">
+        <button type="button" data-psl-click="ps-upload-open"><span class="psl-qi" style="--q:#ff7a59"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg></span><strong>Hochladen</strong><small>Single, EP oder Album</small></button>
+        <button type="button" data-psl-click="ps-sub-releases"><span class="psl-qi" style="--q:#a78bfa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span><strong>Meine Musik</strong><small>Verwalten &amp; bearbeiten</small></button>
+        <button type="button" data-psl-click="ps-open-stats"><span class="psl-qi" style="--q:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8M15 7h6v6"/></svg></span><strong>Statistiken</strong><small>Streams &amp; Reaktionen</small></button>
+        <button type="button" data-psl-click="ps-sub-profile"><span class="psl-qi" style="--q:#ffc46b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><strong>Profil</strong><small>Bilder &amp; Beschreibung</small></button>
+      </div>
       <div class="ps-dashboard-section-title"><h2>Deine Veröffentlichungen</h2><button type="button" id="ps-dashboard-all">Alle ansehen →</button></div>
       <div id="ps-dashboard-covers" class="ps-dashboard-covers"></div>
       <h2 class="ps-dashboard-recent-title">Zuletzt hinzugefügt</h2>
@@ -251,11 +257,16 @@
 </aside>
 
 <nav class="psl-tabbar" id="psl-tabbar" aria-label="Schnellnavigation">
-  <button type="button" data-psl-click="open-home" data-psl-tab="home"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 3 10v10a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1V10z"/></svg>Start</button>
-  <button type="button" data-psl-click="ps-open-search" data-psl-tab="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Suche</button>
-  <button type="button" data-psl-click="open-playlists" data-psl-tab="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4v16M9 4v16M14 4l6 16"/></svg>Bibliothek</button>
-  <button type="button" data-psl-click="ps-open-overview" data-psl-tab="studio" class="psl-tab-studio" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Studio</button>
-  <button type="button" data-psl-click="ps-global-account" data-psl-tab="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Konto</button>
+  <button type="button" class="psl-tab-l" data-psl-click="open-home" data-psl-tab="home"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 3 10v10a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1V10z"/></svg>Start</button>
+  <button type="button" class="psl-tab-l" data-psl-click="ps-open-search" data-psl-tab="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Suche</button>
+  <button type="button" class="psl-tab-l" data-psl-click="open-playlists" data-psl-tab="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4v16M9 4v16M14 4l6 16"/></svg>Bibliothek</button>
+  <button type="button" data-psl-click="ps-open-overview" data-psl-tab="studio" class="psl-tab-l psl-tab-studio" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Studio</button>
+  <button type="button" class="psl-tab-l" data-psl-click="ps-global-account" data-psl-tab="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Konto</button>
+  <button type="button" class="psl-tab-a" data-psl-click="open-home" data-psl-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Hören</button>
+  <button type="button" class="psl-tab-a" data-psl-click="ps-open-overview" data-psl-view="ps-unified-overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>Überblick</button>
+  <button type="button" class="psl-tab-a psl-tab-plus" data-psl-click="ps-upload-open" aria-label="Musik hochladen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button type="button" class="psl-tab-a" data-psl-click="ps-sub-releases" data-psl-view="ps-unified-music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Musik</button>
+  <button type="button" class="psl-tab-a" data-psl-click="ps-open-stats" data-psl-view="ps-unified-stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Zahlen</button>
 </nav>
 
 <div id="ps-upload-overlay" class="ps-upload-overlay hidden">
@@ -281,6 +292,6 @@
 <script src="app.js?v=track-order-1"></script>
 <script src="ps-image-editor.js?v=1"></script>
 <script src="unified.js?v=album-list-2"></script>
-<script defer src="ps-live.js?v=2"></script>
+<script defer src="ps-live.js?v=3"></script>
 </body>
 </html>

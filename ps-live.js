@@ -125,7 +125,7 @@ function syncNav(){
   if(['homeview','playlistview','albumview'].some(isOpen)){const open=UNI.filter(isOpen);if(open.length){open.forEach(id=>$(id).classList.add('hidden'));setCls(d.body,'ps-artist-view',false);return}}
   const v=activeView();setCls(d.body,'psl-artist-zone',v.startsWith('ps-unified-'));const tab=v.startsWith('ps-unified-')?'studio':v==='playlistview'?'library':'home';
   d.querySelectorAll('#psl-tabbar [data-psl-tab]').forEach(b=>setCls(b,'psl-active',b.dataset.pslTab===tab));
-  d.querySelectorAll('.psl-artist-tabs [data-psl-view]').forEach(b=>setCls(b,'psl-active',b.dataset.pslView===v));
+  d.querySelectorAll('.psl-artist-tabs [data-psl-view],#psl-tabbar [data-psl-view]').forEach(b=>setCls(b,'psl-active',b.dataset.pslView===v));
   d.querySelectorAll('.ps-main-nav button').forEach(b=>{setCls(b,'ps-nav-active',false);setCls(b,'psl-active',b.id===NAV_FOR[v])});
 }
 for(const id of VIEWS){const el=$(id);if(el)new MutationObserver(syncNav).observe(el,{attributes:true,attributeFilter:['class']})}
@@ -140,6 +140,47 @@ const upContent=$('ps-upload-step-content'),upFwd=$('ps-upload-forward'),upBack=
 if(upContent&&upFwd&&upBack){const steps=d.querySelectorAll('.ps-upload-steps span');
   const f=()=>{const step=/veröffentlichen/i.test(upFwd.textContent)?2:upBack.hidden?0:1;steps.forEach((s,i)=>setCls(s,'psl-done',i<=step))};
   new MutationObserver(f).observe(upContent,{childList:true});new MutationObserver(f).observe(upFwd,{childList:true,characterData:true,subtree:true});f()}
+
+/* ---------- Datei-Auswahl als Ablagefläche ---------- */
+const UP_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>';
+const IMG_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5L5 20"/></svg>';
+function wrapFileInputs(box){
+  box.querySelectorAll('input[type=file]').forEach(input=>{
+    if(input.parentElement?.classList.contains('psl-drop'))return;
+    const audio=/mp3|audio/i.test(input.accept||''),wrap=d.createElement('label');wrap.className='psl-drop'+(audio?' psl-drop-big':'');
+    const ico=d.createElement('span');ico.className='psl-drop-ico';ico.innerHTML=audio?UP_ICON:IMG_ICON;
+    const txt=d.createElement('span');txt.className='psl-drop-txt';const t=d.createElement('strong'),h=d.createElement('small');
+    t.textContent=audio?(input.multiple?'MP3-Dateien auswählen':'MP3 auswählen'):'Bild auswählen';
+    h.textContent=audio?'Tippen oder Dateien hierher ziehen · max. 25 MB pro Song':'JPG, PNG oder WebP · danach zuschneiden';
+    txt.append(t,h);input.before(wrap);wrap.append(ico,txt,input);
+    input.addEventListener('change',()=>{const n=input.files?.length||0;if(n&&!audio){t.textContent=input.files[0].name;h.textContent='Ausgewählt ✓'}});
+    wrap.addEventListener('dragover',()=>wrap.classList.add('psl-over'));for(const ev of ['dragleave','drop'])wrap.addEventListener(ev,()=>wrap.classList.remove('psl-over'));
+  });
+}
+for(const id of ['ps-upload-step-content','ps-unified-profile-body']){const box=$(id);if(box)new MutationObserver(()=>wrapFileInputs(box)).observe(box,{childList:true,subtree:true})}
+
+/* ---------- Künstlerprofil: Live-Vorschau über dem Formular ---------- */
+const profBody=$('ps-unified-profile-body');
+function buildProfilePreview(){
+  const form=profBody?.querySelector('.ps-unified-profile-form');if(!form||profBody.querySelector('.psl-pp'))return;
+  const nameIn=form.querySelector('label input'),bioIn=form.querySelector('label textarea'),boxes=[...form.querySelectorAll(':scope>div')];
+  const logoImg=boxes[0]?.querySelector('img'),bannerImg=boxes[1]?.querySelector('img');
+  const pp=d.createElement('div');pp.className='psl-pp';
+  const banner=d.createElement('div');banner.className='psl-pp-banner';if(bannerImg)banner.style.backgroundImage='url("'+bannerImg.src.replace(/"/g,'%22')+'")';
+  const body=d.createElement('div');body.className='psl-pp-body';
+  const logo=d.createElement('div');logo.className='psl-pp-logo';const logoIn=d.createElement('div');logo.append(logoIn);
+  const setLogo=src=>{logoIn.replaceChildren();if(src){const im=new Image();im.src=src;im.alt='';logoIn.append(im)}else logoIn.textContent=(nameIn?.value||'♫').trim().slice(0,2).toUpperCase()};
+  setLogo(logoImg?.src);
+  const who=d.createElement('div');who.className='psl-pp-who';const h=d.createElement('h2'),k=d.createElement('span');k.className='eyebrow';k.textContent='SO SEHEN DICH HÖRER';who.append(k,h);
+  const bio=d.createElement('p');bio.className='psl-pp-bio';
+  body.append(logo,who);pp.append(banner,body,bio);
+  const sync=()=>{h.textContent=nameIn?.value.trim()||'Dein Künstlername';bio.textContent=bioIn?.value.trim()||'Erzähl deinen Hörern etwas über dich.';if(!logoIn.querySelector('img'))setLogo('')};
+  nameIn?.addEventListener('input',sync);bioIn?.addEventListener('input',sync);sync();
+  const pick=(i,fn)=>boxes[i]?.querySelector('input[type=file]')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f&&f.type.startsWith('image/'))fn(URL.createObjectURL(f))});
+  pick(0,setLogo);pick(1,src=>banner.style.backgroundImage='url("'+src+'")');
+  profBody.classList.add('psl-has-preview');form.before(pp);
+}
+if(profBody)new MutationObserver(buildProfilePreview).observe(profBody,{childList:true});
 
 /* ---------- Mini-Player: Tippen öffnet den Vollplayer ---------- */
 const expandBtn=$('expand');

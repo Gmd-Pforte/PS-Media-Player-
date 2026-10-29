@@ -842,3 +842,32 @@ body:not(.psl-artist-zone) #psl-tabbar .psl-tab-a{display:none}
 .ps-virtual-revenue{border:1px solid rgba(146,208,173,.34);background:linear-gradient(130deg,rgba(27,81,65,.22),rgba(53,33,82,.15));margin:18px 0;padding:23px;border-radius:20px}
 .ps-virtual-revenue-value{display:block;font-size:clamp(28px,5vw,46px);font-weight:850;letter-spacing:-.035em;color:#a6efd1;margin:12px 0}
 .ps-virtual-revenue .ps-stats-desc{max-width:750px;line-height:1.55}
+
+
+/* PS MUSIC STREAM 1.1 – präzisere Fortschrittsleisten auf PC und Mobil */
+.player:not(.expanded){max-width:980px}
+.player:not(.expanded) #ps-mini-progress{
+  left:8px;right:8px;bottom:0;height:22px;
+  touch-action:none;cursor:pointer;
+}
+.player:not(.expanded) #ps-mini-progress::before{
+  left:0;right:0;bottom:7px;height:5px;border-radius:999px;
+  background:rgba(255,255,255,.22);
+}
+.player:not(.expanded) #ps-mini-progress-fill{
+  bottom:7px;height:5px;border-radius:999px;
+}
+.player:not(.expanded) #ps-mini-progress:hover::before,
+.player:not(.expanded) #ps-mini-progress:focus-visible::before{height:7px;bottom:6px}
+.player:not(.expanded) #ps-mini-progress:hover #ps-mini-progress-fill,
+.player:not(.expanded) #ps-mini-progress:focus-visible #ps-mini-progress-fill{height:7px;bottom:6px}
+#ps-mini-progress:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+.player.expanded .ps-progress{grid-template-columns:auto minmax(0,1fr) auto;gap:8px}
+.player.expanded .psl-seek{min-width:0;height:58px}
+.player.expanded #ps-seek{cursor:pointer;touch-action:pan-x}
+@media(max-width:600px){
+  .player:not(.expanded) #ps-mini-progress{left:6px;right:6px;height:24px}
+  .player:not(.expanded) #ps-mini-progress::before,
+  .player:not(.expanded) #ps-mini-progress-fill{bottom:8px}
+  .player.expanded .ps-progress{gap:6px}
+}

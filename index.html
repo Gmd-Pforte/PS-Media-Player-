@@ -52,6 +52,7 @@
       <button type="button" id="ps-sub-profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Künstlerprofil</span></button>
       <button type="button" id="ps-sub-security" onclick="document.getElementById(&quot;ps-menu-security&quot;)?.click()">🔐 Kontosicherheit</button>
     </div>
+    <button type="button" id="ps-open-artist-help" hidden>📘 Updates & Anleitung</button>
     <button class="btn secondary small" id="ps-open-stats" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistiken</span></button>
   </nav>
 
@@ -73,6 +74,7 @@
       <button type="button" data-psl-click="ps-sub-releases" data-psl-view="ps-unified-music">Meine Musik</button>
       <button type="button" data-psl-click="ps-open-stats" data-psl-view="ps-unified-stats">Statistiken</button>
       <button type="button" data-psl-click="ps-sub-profile" data-psl-view="ps-unified-profile">Profil</button>
+      <button type="button" id="ps-artist-help-tab">📘 Hilfe & Updates</button>
       <button type="button" class="psl-tab-upload" data-psl-click="ps-upload-open">＋ Hochladen</button>
     </div>
 
@@ -335,6 +337,7 @@
 <script src="ps-password.js?v=1"></script>
 <script src="ps-security-question-v4.js?v=4"></script>
 <script>document.getElementById("ps-security-shortcut").onclick=function(){document.getElementById("ps-menu-security").click()};</script>
+<script src="ps-artist-help.js?v=1"></script>
 <script defer src="ps-live.js?v=5"></script>
 </body>
 </html>

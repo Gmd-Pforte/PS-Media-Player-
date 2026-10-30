@@ -83,7 +83,7 @@ function linkPlayerArtist(song){
   el.style.textUnderlineOffset='3px';
   el.setAttribute('role','link');el.setAttribute('tabindex','0');
   el.setAttribute('aria-label','Künstlerprofil von '+song.artist+' öffnen');
-  const go=e=>{e?.stopPropagation();const url='profile.html?id='+encodeURIComponent(artist.user_id);const a=document.createElement('a');a.href=url;a.style.display='none';document.body.append(a);a.click();a.remove()};
+  const go=e=>{e?.stopPropagation();if($('player')?.classList.contains('expanded'))$('expand')?.click();const url='profile.html?id='+encodeURIComponent(artist.user_id);const a=document.createElement('a');a.href=url;a.style.display='none';document.body.append(a);a.click();a.remove()};
   el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(e)}};
  }
 }

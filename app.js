@@ -32,7 +32,19 @@ function psShowSearchSuggestions(){
 $('q').addEventListener('keydown',e=>{if(e.key==='Escape'){const r=document.getElementById('ps-search-suggestions');if(r)r.hidden=true;$('q').blur()}});
 document.addEventListener('click',e=>{if(!e.target.closest('.ps-header-search')){const r=document.getElementById('ps-search-suggestions');if(r)r.hidden=true}});
 
-function play(s){if(!verifiedListener){location.href='listener.html';return}if(s.audio_url)playDirect(s)}$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');document.body.classList.toggle('ps-full-player-open',yes);$('expand').textContent=yes?'⌄ Minimieren':'⤢ Vollplayer';$('expand').setAttribute('aria-label',yes?'Vollplayer minimieren':'Vollplayer öffnen')};$('close').onclick=()=>{stopDirect();$('player').hidden=true;$('player').classList.remove('expanded');document.body.classList.remove('ps-full-player-open')};render();
+function play(s){if(!verifiedListener){location.href='listener.html';return}if(s.audio_url)playDirect(s)}
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||!event.data||event.data.type!=='psms-profile-play')return;
+ const profileFrame=document.querySelector('.ps-internal-profile iframe');
+ if(!profileFrame||event.source!==profileFrame.contentWindow)return;
+ const songId=event.data.songId;
+ if(typeof songId!=='string'||!/^[a-f0-9-]{36}$/i.test(songId))return;
+ const song=allSongs().find(t=>t.key===songId);
+ if(!song||!verifiedListener)return;
+ play(song);
+ const player=$('player');
+ if(player&&!player.classList.contains('expanded'))$('expand').click();
+});$('expand').onclick=()=>{const yes=$('player').classList.toggle('expanded');document.body.classList.toggle('ps-full-player-open',yes);$('expand').textContent=yes?'⌄ Minimieren':'⤢ Vollplayer';$('expand').setAttribute('aria-label',yes?'Vollplayer minimieren':'Vollplayer öffnen')};$('close').onclick=()=>{stopDirect();$('player').hidden=true;$('player').classList.remove('expanded');document.body.classList.remove('ps-full-player-open')};render();
 let psmsCatalogFingerprint='',psmsCatalogLoading=false;
 async function psmsSyncCatalog(initial=false){
  if(psmsCatalogLoading||document.hidden&&!initial)return;psmsCatalogLoading=true;

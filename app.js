@@ -72,6 +72,22 @@ let verifiedListener=null;let streamSequence=0;let streamReported=false;let stre
 const audio=$('ps-audio');let queueSource='all';let queueOriginal=[];let directSong=null;let repeatOne=false;let repeatMode=0;let previousVolume=.8;let currentQueue=[];let playHistory=[];let playlists=[];let shuffle=false;audio.volume=.8;
 function stopDirect(){++streamSequence;audio.pause();audio.removeAttribute('src');audio.load();directSong=null}
 function formatTime(n){if(!Number.isFinite(n))return '0:00';return Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0')}
+function linkPlayerArtist(song){
+ const artist=artistProfiles.find(a=>a.artist_name===song.artist);
+ for(const id of ['partist','ps-artist-large']){
+  const el=$(id);if(!el)continue;
+  el.textContent=song.artist||'Künstler';
+  if(!artist?.user_id)continue;
+  el.style.cursor='pointer';
+  el.style.textDecoration='underline';
+  el.style.textUnderlineOffset='3px';
+  el.setAttribute('role','link');el.setAttribute('tabindex','0');
+  el.setAttribute('aria-label','Künstlerprofil von '+song.artist+' öffnen');
+  const go=e=>{e?.stopPropagation();const url='profile.html?id='+encodeURIComponent(artist.user_id);const a=document.createElement('a');a.href=url;a.style.display='none';document.body.append(a);a.click();a.remove()};
+  el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(e)}};
+ }
+}
+
 async function playDirect(song){
  if(!song.audio_url)return;
  if(!verifiedListener){location.href='listener.html';return}
@@ -80,7 +96,7 @@ async function playDirect(song){
  $('ps-audio-panel').classList.remove('hidden');$('player').hidden=false;if(!currentQueue.length){currentQueue=allSongs().filter(x=>x.audio_url);queueOriginal=[...currentQueue];queueSource='all'}
  $('ptitle').textContent=song.title;$('partist').textContent=song.artist||'Künstler';
  const artwork=song.cover_url||artistProfiles.find(a=>a.artist_name===song.artist)?.logo_url||song.cover;
- $('pcover').innerHTML=cover(artwork);$('ps-cover-large').innerHTML=cover(artwork);$('ps-title-large').textContent=song.title;$('ps-artist-large').textContent=song.artist||'Künstler';$('player').style.setProperty('--song-cover',safeImg(artwork)?'url("'+safeImg(artwork)+'")':'none');
+ $('pcover').innerHTML=cover(artwork);$('ps-cover-large').innerHTML=cover(artwork);$('ps-title-large').textContent=song.title;$('ps-artist-large').textContent=song.artist||'Künstler';linkPlayerArtist(song);$('player').style.setProperty('--song-cover',safeImg(artwork)?'url("'+safeImg(artwork)+'")':'none');
  if(directSong?.key!==song.key)playHistory.push(song.key);directSong=song;renderQueue();refreshReactions(song.key);streamSongId=song.key;streamReported=false;streamPending=false;listenedSeconds=0;lastPlayhead=null;const thisSequence=++streamSequence;const url=await secureAudioUrl(song.audio_url).catch(e=>{$('ps-audio-status').textContent=e.message;return null});if(!url||thisSequence!==streamSequence)return;audio.src=url;audio.load();
  $('ps-audio-status').textContent='';
  audio.play().catch(()=>{$('ps-audio-status').textContent='Zum Starten bitte ▶ tippen.'});

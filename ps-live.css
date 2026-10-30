@@ -871,3 +871,6 @@ body:not(.psl-artist-zone) #psl-tabbar .psl-tab-a{display:none}
   .player:not(.expanded) #ps-mini-progress-fill{bottom:8px}
   .player.expanded .ps-progress{gap:6px}
 }
+
+/* Embedded artist profile: fullscreen main player must sit above profile overlay. */
+body.ps-profile-open .player.expanded{z-index:12050!important}

@@ -349,24 +349,44 @@ function card(t){
  const del=document.createElement("button");del.className="btn secondary small";del.textContent="×";del.title="Veröffentlichung lokal löschen";del.onclick=async()=>{if(confirm("Diesen lokalen Test-Song entfernen?")){await erase(t.id);await render()}};
  actions.append(playButton,exp,del);row.append(art,info,actions);return row
 }
+
+const PROFILE_KEY="psx-lab-artist-profile-v1";
+function artistProfile(){try{return {...{name:"PS AI MUSIC",bio:"",logo:"",banner:""},...JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")}}catch{return {name:"PS AI MUSIC",bio:"",logo:"",banner:""}}}
+function storeProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}
+function readImage(file,maxSide=900){
+ return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxSide/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.78))};img.onerror=()=>reject(Error("Bild nicht lesbar"));img.src=reader.result};reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file)})
+}
 function profile(){
  const root=$("ps-unified-profile-body");root.replaceChildren();
- const banner=document.createElement("div");banner.className="psx-profile-banner";const avatar=document.createElement("div");avatar.className="psx-avatar";avatar.textContent="PS";
- const title=document.createElement("div");title.className="psx-profile-header";const heading=document.createElement("div");heading.innerHTML="<h2>PS AI MUSIC</h2><p>Künstlerprofil · Meine Veröffentlichungen</p>";title.append(avatar,heading);
- const sections=document.createElement("div");sections.className="psx-profile-sections";
- const releases=document.createElement("section");releases.className="psx-panel";const h=document.createElement("h3");h.textContent="Veröffentlichungen";releases.append(h);
- if(songs.length)for(const t of songs)releases.append(card(t));else {const p=document.createElement("p");p.textContent="Du hast noch keine Musik veröffentlicht.";releases.append(p)}
- const settings=document.createElement("section");settings.className="psx-panel";const h2=document.createElement("h3");h2.textContent="Künstlerdetails";settings.append(h2);
- const paragraph=document.createElement("p");paragraph.textContent="Deine Künstlerdaten werden für diesen Test getrennt gespeichert.";settings.append(paragraph);
- const upload=document.createElement("button");upload.className="btn";upload.textContent="＋ Musik hochladen";upload.onclick=openUpload;settings.append(upload);
- sections.append(releases,settings);root.append(banner,title,sections);
+ const state=artistProfile();
+ const form=document.createElement("div");form.className="ps-unified-profile-form";
+ const h=document.createElement("h2");h.textContent="Mein Künstlerprofil bearbeiten";form.append(h);
+ const fields={};
+ for(const [key,label,tag] of [["name","Künstlername","input"],["bio","Über mich","textarea"]]){
+  const wrap=document.createElement("label");wrap.textContent=label;const field=document.createElement(tag);field.value=state[key]||"";field.maxLength=key==="name"?90:2000;if(tag==="textarea")field.rows=5;wrap.append(field);form.append(wrap);fields[key]=field;
+ }
+ const chosen={};
+ for(const [key,label] of [["logo","Profilbild"],["banner","Banner"]]){
+  const wrap=document.createElement("div");const title=document.createElement("h3");title.textContent=label;wrap.append(title);
+  if(state[key]){const img=document.createElement("img");img.src=state[key];img.alt=label;wrap.append(img)}
+  const input=document.createElement("input");input.type="file";input.accept="image/*";input.setAttribute("aria-label",label+" ersetzen");input.onchange=()=>chosen[key]=input.files[0];wrap.append(input);form.append(wrap);
+ }
+ const message=document.createElement("p");message.setAttribute("role","status");const save=document.createElement("button");save.className="btn";save.textContent="Profil speichern";save.onclick=async()=>{
+  if(!fields.name.value.trim())return message.textContent="Bitte Künstlernamen eintragen.";
+  save.disabled=true;try{const next={...state,name:fields.name.value.trim(),bio:fields.bio.value};for(const key of Object.keys(chosen)){if(chosen[key])next[key]=await readImage(chosen[key],key==="logo"?600:1200)}storeProfile(next);message.textContent="Künstlerprofil gespeichert.";profile();await render()}catch(e){message.textContent=e.message}finally{save.disabled=false}
+ };
+ form.append(save,message);root.append(form);
+ const personal=document.createElement("section");personal.className="psx-panel";personal.style.marginTop="22px";
+ const title=document.createElement("h3");title.textContent="Deine Veröffentlichungen";personal.append(title);
+ const upload=document.createElement("button");upload.className="btn secondary";upload.textContent="＋ Musik hochladen";upload.onclick=openUpload;personal.append(upload);
+ for(const t of songs)personal.append(card(t));root.append(personal);
 }
 async function render(){
  songs=await items();
  const filter=document.querySelector('[data-my-filter][aria-pressed="true"]')?.dataset.myFilter||"all";
  for(const id of ["songs","featured-grid","ps-dashboard-covers","ps-dashboard-recent"]){const el=$(id);if(!el)continue;el.replaceChildren();if(!songs.length){const p=document.createElement("p");p.className="psx-empty";p.textContent="Noch keine Veröffentlichungen vorhanden.";el.append(p)}else songs.forEach(t=>el.append(card(t)))}
  const el=$("ps-my-music-list");el.replaceChildren();const selected=songs.filter(t=>filter==="all"||filter===t.releaseType);if(!selected.length){const p=document.createElement("p");p.className="psx-empty";p.textContent="Keine Veröffentlichungen in dieser Auswahl.";el.append(p)}else selected.forEach(t=>el.append(card(t)));
- const artists=$("artists");artists.replaceChildren();const a=document.createElement("div");a.className="psx-release-row";a.innerHTML='<div class="psx-avatar" style="width:55px;height:55px;font-size:17px">PS</div><div class="psx-release-main"><strong>PS AI MUSIC</strong><small>Künstler</small></div>';a.onclick=()=>show("ps-unified-profile");artists.append(a);
+ const artists=$("artists");artists.replaceChildren();const a=document.createElement("div");a.className="psx-release-row";a.innerHTML='<div class="psx-avatar" style="width:55px;height:55px;font-size:17px">PS</div><div class="psx-release-main"><strong></strong><small>Künstler</small></div>';a.querySelector("strong").textContent=artistProfile().name;a.onclick=()=>show("ps-unified-profile");artists.append(a);
  $("ps-dashboard-streams").textContent="0";$("ps-dashboard-song-count").textContent=songs.length;$("ps-dashboard-release-count").textContent=new Set(songs.map(x=>x.releaseId||x.id)).size;
  profile();
 }
@@ -420,7 +440,7 @@ $("ps-upload-forward").onclick=async()=>{
   for(const t of uploadTracks){
    $("ps-upload-status").textContent="Veröffentlichen: "+(++i)+"/"+uploadTracks.length+" – "+t.title;
    const buffer=await t.file.arrayBuffer();
-   await store({psx:"PSX-CD",version:1,id:crypto.randomUUID(),releaseId:batch,title:t.title.trim(),releaseTitle:uploadTitle.trim(),artist:"PS AI MUSIC",releaseType:uploadTracks.length===1?"single":(uploadType||(uploadTracks.length>=7?"album":"ep")),position:i,cover,mime:"audio/mpeg",encoding:"base64",sha256:await sha(buffer),data:encode(buffer),created:new Date().toISOString()});
+   await store({psx:"PSX-CD",version:1,id:crypto.randomUUID(),releaseId:batch,title:t.title.trim(),releaseTitle:uploadTitle.trim(),artist:artistProfile().name,releaseType:uploadTracks.length===1?"single":(uploadType||(uploadTracks.length>=7?"album":"ep")),position:i,cover,mime:"audio/mpeg",encoding:"base64",sha256:await sha(buffer),data:encode(buffer),created:new Date().toISOString()});
   }
   await render();$("ps-upload-overlay").classList.add("hidden");show("ps-unified-music");
  }catch(e){$("ps-upload-status").textContent="Fehler: "+e.message}

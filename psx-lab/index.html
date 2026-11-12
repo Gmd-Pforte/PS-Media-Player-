@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PS MUSIC STREAM – PSX-CD Labor</title><meta name="theme-color" content="#0b1013">
+<style>
+:root{color-scheme:dark;--bg:#0b1013;--p:#172125;--p2:#203032;--mint:#77e2c2;--txt:#f1f7f4;--muted:#a2b6af}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Arial,sans-serif;padding-bottom:110px}
+header{display:flex;justify-content:space-between;align-items:center;padding:19px 25px;background:#111a1d;border-bottom:1px solid #29413c}
+.brand{font-weight:900;font-size:21px;color:var(--mint)}.brand small{display:block;font-size:9px;letter-spacing:2px;color:#b7c8c3}.flag{font-size:11px;border:1px solid #365449;border-radius:25px;color:var(--mint);padding:6px 11px}
+.shell{max-width:1200px;margin:auto;display:grid;grid-template-columns:205px 1fr;gap:22px;padding:20px}
+aside,.panel,.song{background:var(--p);border:1px solid #29403e;border-radius:14px}aside{padding:14px}aside div{padding:14px 8px;color:var(--muted)}aside .active{color:var(--mint);background:#213a33;border-radius:10px}
+h1{font-size:29px;margin:0 0 8px}.sub{color:var(--muted);margin:0 0 22px;line-height:1.5}.panel{padding:22px;margin-bottom:18px}
+h2{font-size:18px;margin:0 0 14px}label{display:block;margin:12px 0 6px;font-size:13px;color:var(--muted)}
+input[type=text],input[type=file]{width:100%;background:#101b1e;color:white;padding:13px;border:1px solid #39504e;border-radius:10px}
+button,.button{cursor:pointer;border:0;border-radius:10px;background:var(--mint);color:#071813;font-weight:800;padding:12px 18px;display:inline-block}
+button.secondary{background:#2a3a3b;color:#e6f3ee}button:disabled{opacity:.4;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}
+.song{display:flex;gap:14px;align-items:center;padding:14px;margin-top:12px}.art{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#326f64,#182327);display:grid;place-items:center;font-size:30px;flex-shrink:0}
+.info{flex:1;min-width:0}.info strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.info small{color:var(--muted)}
+footer{position:fixed;left:0;right:0;bottom:0;background:#172225;border-top:1px solid #39534d;padding:12px 18px;display:flex;align-items:center;gap:16px;z-index:3}
+footer .track{min-width:120px;max-width:245px;font-size:13px}footer .track small{color:var(--muted);display:block}
+audio{flex:1;min-width:0;max-width:900px;width:100%}.note{color:#a3bab1;font-size:12px;line-height:1.5;margin-top:12px}#status{color:var(--mint);min-height:24px}
+@media(max-width:720px){.shell{display:block;padding:12px}aside{display:none}header{padding:15px}h1{font-size:22px}footer{flex-wrap:wrap}.track{width:100%}audio{width:100%} .panel{padding:16px}}
+</style></head><body>
+<header><div class="brand">PS MUSIC STREAM<small>MUSIK AUS ECHTEN GEFÜHLEN</small></div><span class="flag">PSX-CD TEST · SEPARAT</span></header>
+<div class="shell"><aside><div class="active">⌂ &nbsp; Startseite</div><div>⌕ &nbsp; Suchen</div><div>♫ &nbsp; Deine Bibliothek</div><div>♡ &nbsp; Favoriten</div><div>◉ &nbsp; Künstlerstudio</div></aside>
+<main><section class="panel"><h1>PSX-CD Testlabor</h1><p class="sub">Teste den Upload einer MP3, die automatische Umwandlung in unseren Musikcode und das direkte Abspielen über die gewohnte untere Playerleiste. Die echte Plattform bleibt unverändert.</p>
+<h2>♫ Musik veröffentlichen (nur lokal)</h2>
+<label for="file">MP3 wählen</label><input id="file" type="file" accept=".mp3,audio/mpeg">
+<label for="title">Songtitel</label><input id="title" type="text" placeholder="Wird aus Dateinamen übernommen">
+<label for="artist">Künstler</label><input id="artist" type="text" value="PS AI MUSIC">
+<div class="actions"><button id="convert">MP3 → PSX-CD erstellen</button><button class="secondary" id="importButton">Vorhandene .psx importieren</button><input id="psxInput" type="file" accept=".psx,application/json" hidden></div>
+<p class="note">Hier wird nichts zu Dropbox, Supabase oder GitHub hochgeladen. Musik wird nur im lokalen Browserspeicher dieses Geräts verwahrt. Eine neue PSX-CD ist vorerst ein selbstbeschreibendes Paket mit originalen MP3-Bytes.</p><div id="status" role="status"></div></section>
+<section class="panel"><h2>Deine PSX-CD Bibliothek</h2><div id="songs"><p class="sub">Noch keine Musik vorhanden. Lade oben deine erste MP3 hoch.</p></div></section>
+</main></div>
+<footer><div class="track"><strong id="now">Kein Song ausgewählt</strong><small id="nowArtist">PSX-CD Player</small></div><audio id="player" controls preload="none"></audio></footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const DB="psx-lab-v1",STORE="discs";
+let db,objectUrl;
+const say=t=>$("status").textContent=t;
+function openDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:"id"});r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function put(item){return new Promise((resolve,reject)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).put(item);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
+function all(){return new Promise((resolve,reject)=>{const r=db.transaction(STORE).objectStore(STORE).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function del(id){return new Promise((resolve,reject)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).delete(id);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
+function toBase64(buffer){const bytes=new Uint8Array(buffer);let s="";for(let i=0;i<bytes.length;i+=16384){s+=String.fromCharCode(...bytes.subarray(i,i+16384))}return btoa(s)}
+function fromBase64(data){const binary=atob(data),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes}
+async function digest(buffer){const d=await crypto.subtle.digest("SHA-256",buffer);return Array.from(new Uint8Array(d),v=>v.toString(16).padStart(2,"0")).join("")}
+function saveBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function safeName(x){return x.replace(/[^a-z0-9äöüß_-]+/gi,"_").slice(0,70)}
+async function render(){const list=await all(),root=$("songs");root.replaceChildren();if(!list.length){root.innerHTML='<p class="sub">Noch keine Musik vorhanden.</p>';return}
+for(const song of list.reverse()){const row=document.createElement("div");row.className="song";const art=document.createElement("div");art.className="art";art.textContent="♫";const info=document.createElement("div");info.className="info";const title=document.createElement("strong");title.textContent=song.title;const meta=document.createElement("small");meta.textContent=song.artist+" · PSX-CD · "+(song.data.length*3/4/1e6).toFixed(2)+" MB Audio";info.append(title,meta);const play=document.createElement("button");play.textContent="▶";play.title="Abspielen";play.onclick=()=>playSong(song);const exp=document.createElement("button");exp.className="secondary";exp.textContent="↓";exp.title="PSX exportieren";exp.onclick=()=>saveBlob(new Blob([JSON.stringify(song)],{type:"application/json"}),safeName(song.title)+".psx");const remove=document.createElement("button");remove.className="secondary";remove.textContent="×";remove.title="Löschen";remove.onclick=async()=>{if(confirm("Diese Test-CD wirklich vom Gerät entfernen?")){await del(song.id);await render()}};row.append(art,info,play,exp,remove);root.append(row)}}
+function playSong(song){if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(new Blob([fromBase64(song.data)],{type:"audio/mpeg"}));$("player").src=objectUrl;$("now").textContent=song.title;$("nowArtist").textContent=song.artist;$("player").play().catch(()=>say("Tippe auf Play in der Playerleiste."))}
+$("convert").onclick=async()=>{const f=$("file").files[0];if(!f)return say("Bitte zuerst eine MP3 wählen.");if(!/\.mp3$/i.test(f.name))return say("Für diese Version bitte eine MP3 wählen.");$("convert").disabled=true;say("Wandle Musik in PSX-Code um ...");try{const buffer=await f.arrayBuffer();const song={psx:"PSX-CD",version:1,id:crypto.randomUUID(),title:$("title").value.trim()||f.name.replace(/\.mp3$/i,""),artist:$("artist").value.trim()||"Unbekannt",mime:"audio/mpeg",encoding:"base64",sha256:await digest(buffer),data:toBase64(buffer),created:new Date().toISOString()};await put(song);await render();say("PSX-CD erstellt! Der Song ist unten direkt abspielbar.")}catch(e){say("Fehler: "+e.message)}finally{$("convert").disabled=false}};
+$("importButton").onclick=()=>$("psxInput").click();
+$("psxInput").onchange=async()=>{const f=$("psxInput").files[0];if(!f)return;try{const song=JSON.parse(await f.text());if(song.psx!=="PSX-CD"||song.encoding!=="base64"||!song.data||!song.title)throw Error("Nicht unterstütztes PSX-CD-Format");const buf=fromBase64(song.data);const hash=await digest(buf);if(song.sha256&&hash!==song.sha256)throw Error("Prüfsumme stimmt nicht");song.id=crypto.randomUUID();await put(song);await render();say("PSX-CD importiert und geprüft.")}catch(e){say("Import fehlgeschlagen: "+e.message)}};
+$("file").onchange=()=>{const f=$("file").files[0];if(f&&!$("title").value)$("title").value=f.name.replace(/\.mp3$/i,"")};
+(async()=>{try{db=await openDb();await render();say("Testbereit – keine Verbindung zu Produktionsdaten.")}catch(e){say("Browser-Speicher nicht verfügbar: "+e.message)}})();
+</script></body></html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07060b">
 <meta name="description" content="PS MUSIC STREAM – Musik aus echten Gefühlen">
-<title>PS MUSIC STREAM – PSX-CD Test</title>
+<title>PS MUSIC STREAM</title>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PS MUSIC STREAM">
 <meta property="og:title" content="PS MUSIC STREAM – Musik aus echten Gefühlen">
@@ -23,10 +23,18 @@
 .psx-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);padding:14px;border-radius:var(--r-md);margin:9px 0}
 .psx-art{background:var(--glow);border-radius:12px;width:60px;height:60px;display:grid;place-items:center;flex:none;font-size:26px}
 .psx-meta{flex:1;min-width:0}.psx-meta strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.psx-meta small{display:block}
-.psx-marker{position:fixed;z-index:80;right:12px;top:70px;color:var(--mint);background:#1d1929;border:1px solid var(--line-2);padding:6px 12px;border-radius:99px;font-size:11px;font-weight:800}
+
 .psx-upload-fields{display:grid;gap:9px}.psx-upload-fields p{font-size:12px}
 .psx-empty{padding:18px;border:1px dashed var(--line-2);border-radius:var(--r-md)}
 @media(max-width:700px){.psx-marker{top:5px;right:5px;font-size:9px}.psx-item{flex-wrap:wrap}.psx-art{width:45px;height:45px}}
+
+.psx-profile-banner{min-height:190px;border-radius:24px;background:linear-gradient(120deg,#321d52,#bd518e 58%,#25213e);display:flex;align-items:end;padding:24px;margin-bottom:16px}
+.psx-profile-header{display:flex;align-items:center;gap:18px;margin-bottom:24px}.psx-avatar{width:90px;height:90px;border-radius:50%;display:grid;place-items:center;background:var(--glow);font:800 28px var(--display);border:4px solid var(--ink)}
+.psx-profile-header h2{font-size:32px}.psx-profile-sections{display:grid;grid-template-columns:1fr 1fr;gap:16px}.psx-panel{background:var(--surface);border:1px solid var(--line);padding:20px;border-radius:var(--r-lg)}
+.psx-release-row{display:flex;gap:12px;align-items:center;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:8px 0}
+.psx-cover{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--glow);display:grid;place-items:center;flex:none}.psx-release-main{flex:1;min-width:0}.psx-release-main strong,.psx-release-main small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.psx-release-actions{display:flex;gap:7px}.psx-release-actions button{height:36px;padding:0 13px}.psx-upload-track{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--line)}.psx-upload-track span{flex:1}.psx-upload-track button{height:32px}
+@media(max-width:700px){.psx-profile-sections{grid-template-columns:1fr}.psx-profile-header h2{font-size:24px}.psx-release-actions{flex-wrap:wrap}.psx-cover{width:48px;height:48px}}
 </style></head>
 <body class="psl">
 <div id="psl-ambient" aria-hidden="true"></div>
@@ -93,7 +101,7 @@
           <span class="eyebrow">PS AI MUSIC</span>
           <h1><span class="psl-w">Musik,</span> <span class="psl-w" style="animation-delay:.1s">die</span> <span class="psl-w" style="animation-delay:.2s">etwas</span> <em class="psl-w" style="animation-delay:.3s">bedeutet.</em></h1>
           <p>Entdecke Künstler, Alben und Songs. Erstelle deine Lieblingsplaylists und höre direkt hier.</p>
-          <div class="psl-hero-actions"><button type="button" class="btn" id="psx-load-disc">💿 PSX-CD laden</button><input type="file" id="psx-global-file" accept=".psx,application/json" hidden>
+          <div class="psl-hero-actions">
             <a href="#music" class="btn">Jetzt entdecken</a>
             <button type="button" class="btn secondary" id="psl-random"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Zufällig reinhören</button>
           </div>
@@ -121,7 +129,7 @@
 
       <section class="psl-block">
         <div class="ps-section-heading"><div><div class="ps-section-kicker">EINZELSTÜCKE</div><h2>Singles</h2></div></div>
-        <div class="psl-hero-actions" style="margin:0 0 16px"><button type="button" id="psx-library-import" class="btn secondary">💿 PSX-CD laden</button></div><div id="songs" class="list"></div>
+        <div id="songs" class="list"></div>
       </section>
     </section>
 
@@ -330,19 +338,94 @@ function encode(buffer){let s="";const a=new Uint8Array(buffer);for(let i=0;i<a.
 function decode(str){const b=atob(str),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
 async function sha(buffer){const a=new Uint8Array(await crypto.subtle.digest("SHA-256",buffer));return [...a].map(n=>n.toString(16).padStart(2,"0")).join("")}
 function exportDisc(t){const u=URL.createObjectURL(new Blob([JSON.stringify(t)],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download=t.title.replace(/[^a-z0-9_-]/gi,"_")+".psx";a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
-function card(t){const row=document.createElement("div");row.className="psx-item";const art=document.createElement("div");art.className="psx-art";art.textContent="♫";const info=document.createElement("div");info.className="psx-meta";const name=document.createElement("strong");name.textContent=t.title;const artist=document.createElement("small");artist.textContent=t.artist+" · PSX DIGITAL DISC";info.append(name,artist);const b=document.createElement("button");b.className="btn small";b.textContent="▶";b.onclick=()=>play(t);const e=document.createElement("button");e.className="btn secondary small";e.textContent="↓";e.onclick=()=>exportDisc(t);const d=document.createElement("button");d.className="btn secondary small";d.textContent="×";d.onclick=async()=>{if(confirm("Nur diese lokale Test-CD löschen?")){await erase(t.id);await render()}};row.append(art,info,b,e,d);return row}
-async function render(){songs=await items();for(const id of ["songs","featured-grid","ps-my-music-list","ps-dashboard-covers","ps-dashboard-recent"]){const el=$(id);if(!el)continue;el.replaceChildren();if(!songs.length){const p=document.createElement("p");p.className="psx-empty";p.textContent="Noch keine PSX-CD. Öffne den Künstlerbereich und lade eine MP3 hoch.";el.append(p)}else songs.forEach(t=>el.append(card(t)))}const artists=$("artists");artists.replaceChildren();const c=document.createElement("div");c.className="psx-item";c.innerHTML='<div class="psx-art">PS</div><div class="psx-meta"><strong>PS AI MUSIC</strong><small>Testkünstler</small></div>';artists.append(c);$("ps-dashboard-streams").textContent="Test";$("ps-dashboard-song-count").textContent=songs.length;$("ps-dashboard-release-count").textContent=songs.length}
+
+function card(t){
+ const row=document.createElement("div");row.className="psx-release-row";
+ const art=t.cover?document.createElement("img"):document.createElement("div");art.className="psx-cover";if(t.cover)art.src=t.cover;else art.textContent="♫";
+ const info=document.createElement("div");info.className="psx-release-main";const name=document.createElement("strong");name.textContent=t.title;const details=document.createElement("small");details.textContent=t.artist+" · "+(t.releaseType==="single"?"Single":t.releaseType==="album"?"Album":"EP");info.append(name,details);
+ const actions=document.createElement("div");actions.className="psx-release-actions";
+ const playButton=document.createElement("button");playButton.className="btn small";playButton.textContent="▶";playButton.onclick=()=>play(t);
+ const exp=document.createElement("button");exp.className="btn secondary small";exp.textContent="↓";exp.title="Datei exportieren";exp.onclick=()=>exportDisc(t);
+ const del=document.createElement("button");del.className="btn secondary small";del.textContent="×";del.title="Veröffentlichung lokal löschen";del.onclick=async()=>{if(confirm("Diesen lokalen Test-Song entfernen?")){await erase(t.id);await render()}};
+ actions.append(playButton,exp,del);row.append(art,info,actions);return row
+}
+function profile(){
+ const root=$("ps-unified-profile-body");root.replaceChildren();
+ const banner=document.createElement("div");banner.className="psx-profile-banner";const avatar=document.createElement("div");avatar.className="psx-avatar";avatar.textContent="PS";
+ const title=document.createElement("div");title.className="psx-profile-header";const heading=document.createElement("div");heading.innerHTML="<h2>PS AI MUSIC</h2><p>Künstlerprofil · Meine Veröffentlichungen</p>";title.append(avatar,heading);
+ const sections=document.createElement("div");sections.className="psx-profile-sections";
+ const releases=document.createElement("section");releases.className="psx-panel";const h=document.createElement("h3");h.textContent="Veröffentlichungen";releases.append(h);
+ if(songs.length)for(const t of songs)releases.append(card(t));else {const p=document.createElement("p");p.textContent="Du hast noch keine Musik veröffentlicht.";releases.append(p)}
+ const settings=document.createElement("section");settings.className="psx-panel";const h2=document.createElement("h3");h2.textContent="Künstlerdetails";settings.append(h2);
+ const paragraph=document.createElement("p");paragraph.textContent="Deine Künstlerdaten werden für diesen Test getrennt gespeichert.";settings.append(paragraph);
+ const upload=document.createElement("button");upload.className="btn";upload.textContent="＋ Musik hochladen";upload.onclick=openUpload;settings.append(upload);
+ sections.append(releases,settings);root.append(banner,title,sections);
+}
+async function render(){
+ songs=await items();
+ const filter=document.querySelector('[data-my-filter][aria-pressed="true"]')?.dataset.myFilter||"all";
+ for(const id of ["songs","featured-grid","ps-dashboard-covers","ps-dashboard-recent"]){const el=$(id);if(!el)continue;el.replaceChildren();if(!songs.length){const p=document.createElement("p");p.className="psx-empty";p.textContent="Noch keine Veröffentlichungen vorhanden.";el.append(p)}else songs.forEach(t=>el.append(card(t)))}
+ const el=$("ps-my-music-list");el.replaceChildren();const selected=songs.filter(t=>filter==="all"||filter===t.releaseType);if(!selected.length){const p=document.createElement("p");p.className="psx-empty";p.textContent="Keine Veröffentlichungen in dieser Auswahl.";el.append(p)}else selected.forEach(t=>el.append(card(t)));
+ const artists=$("artists");artists.replaceChildren();const a=document.createElement("div");a.className="psx-release-row";a.innerHTML='<div class="psx-avatar" style="width:55px;height:55px;font-size:17px">PS</div><div class="psx-release-main"><strong>PS AI MUSIC</strong><small>Künstler</small></div>';a.onclick=()=>show("ps-unified-profile");artists.append(a);
+ $("ps-dashboard-streams").textContent="0";$("ps-dashboard-song-count").textContent=songs.length;$("ps-dashboard-release-count").textContent=new Set(songs.map(x=>x.releaseId||x.id)).size;
+ profile();
+}
 function clock(x){return Number.isFinite(x)?Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0"):"0:00"}
 function sync(){const p=!audio.paused;for(const id of ["ps-play","ps-mini-play"])$(id).textContent=p?"❚❚":"▶";$("ps-time").textContent=clock(audio.currentTime);$("ps-duration").textContent=clock(audio.duration);const n=audio.duration?100*audio.currentTime/audio.duration:0;$("ps-seek").value=n;$("ps-mini-progress-fill").style.width=n+"%"}
 function play(t){current=t;if(audioLink)URL.revokeObjectURL(audioLink);audioLink=URL.createObjectURL(new Blob([decode(t.data)],{type:"audio/mpeg"}));audio.src=audioLink;for(const id of ["ptitle","ps-title-large"])$(id).textContent=t.title;for(const id of ["partist","ps-artist-large"])$(id).textContent=t.artist;$("pcover").textContent="♫";$("ps-cover-large").textContent="♫";$("player").hidden=false;document.body.classList.add("psl-player-on");audio.play().catch(()=>{});sync()}
 function toggle(){audio.paused?audio.play():audio.pause()}
 function skip(dir){if(!songs.length)return;let i=songs.findIndex(t=>current&&t.id===current.id);play(songs[(i+dir+songs.length)%songs.length])}
-function openUpload(){$("ps-upload-overlay").classList.remove("hidden");$("ps-upload-back").hidden=true;$("ps-upload-next").hidden=true;
-$("ps-upload-step-content").innerHTML='<div class="psx-upload-fields"><p>PSX-CD Test: MP3 wird direkt in Musikcode umgewandelt und ausschließlich lokal im Browser gespeichert.</p><label for="psx-file">MP3 auswählen</label><input id="psx-file" type="file" accept=".mp3,audio/mpeg"><label for="psx-title">Songtitel</label><input id="psx-title" placeholder="Titel"><label for="psx-artist">Künstler</label><input id="psx-artist" value="PS AI MUSIC"><button class="btn" id="psx-create">PSX-CD veröffentlichen (Test)</button><button class="btn secondary" id="psx-import">PSX-Datei importieren</button><input hidden type="file" id="psx-import-file" accept=".psx"></div>';
-$("psx-file").onchange=()=>{const f=$("psx-file").files[0];if(f)$("psx-title").value=f.name.replace(/\.mp3$/i,"")};
-$("psx-create").onclick=async()=>{const f=$("psx-file").files[0];if(!f||!/\.mp3$/i.test(f.name))return $("ps-upload-status").textContent="Bitte eine MP3 auswählen.";$("psx-create").disabled=true;$("ps-upload-status").textContent="PSX-Musikcode wird erstellt ...";try{const buffer=await f.arrayBuffer();const t={psx:"PSX-CD",version:1,id:crypto.randomUUID(),title:$("psx-title").value||f.name.replace(/\.mp3$/i,""),artist:$("psx-artist").value||"PS AI MUSIC",mime:"audio/mpeg",encoding:"base64",sha256:await sha(buffer),data:encode(buffer)};await store(t);await render();$("ps-upload-status").textContent="PSX-CD erstellt.";$("ps-upload-overlay").classList.add("hidden");show("ps-unified-music")}catch(e){$("ps-upload-status").textContent=e.message}finally{$("psx-create").disabled=false}};
-$("psx-import").onclick=()=>$("psx-import-file").click();$("psx-import-file").onchange=async()=>{await importPsxFile($("psx-import-file").files[0])}}
 
+let uploadStep=0, uploadTracks=[], uploadTitle="", uploadType="", uploadCover=null;
+function openUpload(){
+ uploadStep=0;uploadTracks=[];uploadTitle="";uploadCover=null;uploadType="";
+ $("ps-upload-overlay").classList.remove("hidden");renderUpload();
+}
+function renderUpload(){
+ const box=$("ps-upload-step-content");box.replaceChildren();$("ps-upload-status").textContent="";
+ $("ps-upload-back").hidden=uploadStep===0;
+ $("ps-upload-forward").textContent=uploadStep===2?"Veröffentlichen":"Weiter";
+ const steps=document.querySelectorAll(".ps-upload-steps span");steps.forEach((x,i)=>x.style.opacity=i===uploadStep?"1":".45");
+ if(uploadStep===0){
+  const p=document.createElement("p");p.textContent="MP3-Dateien auswählen (maximal 25 MB je Datei).";
+  const inp=document.createElement("input");inp.type="file";inp.accept=".mp3,audio/mpeg";inp.multiple=true;
+  inp.onchange=()=>{for(const file of inp.files){if(file.size>0&&file.size<=25*1024*1024&&/\.mp3$/i.test(file.name)) uploadTracks.push({file,title:file.name.replace(/\.mp3$/i,"")})}renderUpload()};
+  box.append(p,inp);
+  for(const [i,t] of uploadTracks.entries()){const line=document.createElement("div");line.className="psx-upload-track";const name=document.createElement("span");name.textContent=t.file.name;const rem=document.createElement("button");rem.className="btn secondary small";rem.textContent="Entfernen";rem.onclick=()=>{uploadTracks.splice(i,1);renderUpload()};line.append(name,rem);box.append(line)}
+  const status=document.createElement("p");status.textContent=uploadTracks.length?"Automatisch erkannt: "+releaseKind(uploadTracks.length)+" · "+uploadTracks.length+" Songs":"Noch keine gültigen Songs ausgewählt.";box.append(status);
+ }
+ if(uploadStep===1){
+  const l=document.createElement("label");l.textContent="Veröffentlichungstitel";const title=document.createElement("input");title.value=uploadTitle;title.oninput=()=>uploadTitle=title.value;box.append(l,title);
+  if(uploadTracks.length>1){const l=document.createElement("label");l.textContent="Veröffentlichungstyp";const sel=document.createElement("select");for(const [v,name] of [["ep","EP"],["album","Album"]]){const o=document.createElement("option");o.value=v;o.textContent=name;sel.append(o)}sel.value=uploadType||(uploadTracks.length>=7?"album":"ep");sel.onchange=()=>uploadType=sel.value;box.append(l,sel)}
+  const cl=document.createElement("label");cl.textContent="Cover (optional)";const ci=document.createElement("input");ci.type="file";ci.accept="image/*";ci.onchange=()=>uploadCover=ci.files[0]||null;box.append(cl,ci);
+  for(const [i,t] of uploadTracks.entries()){const lab=document.createElement("label");lab.textContent="Song "+(i+1);const field=document.createElement("input");field.value=t.title;field.oninput=()=>t.title=field.value;lab.append(field);box.append(lab)}
+ }
+ if(uploadStep===2){
+  const p=document.createElement("p");p.textContent="Automatisch erkannt: "+releaseKind(uploadTracks.length)+" · "+uploadTracks.length+" Songs";box.append(p);
+  const name=document.createElement("p");name.textContent="Titel: "+uploadTitle;box.append(name);
+  for(const t of uploadTracks){const row=document.createElement("p");row.textContent="♫ "+t.title;box.append(row)}
+  const info=document.createElement("p");info.className="notice";info.textContent="Die Veröffentlichung wird für diesen Funktionstest nur lokal in deinem Browser gespeichert.";box.append(info);
+ }
+}
+function releaseKind(n){return n===1?"Single":n<=6?"EP":"Album"}
+$("ps-upload-back").onclick=()=>{if(uploadStep>0){uploadStep--;renderUpload()}};
+$("ps-upload-forward").onclick=async()=>{
+ if(!uploadTracks.length){$("ps-upload-status").textContent="Wähle mindestens eine gültige MP3-Datei.";return}
+ if(uploadStep===0){uploadStep=1;renderUpload();return}
+ if(uploadStep===1){if(!uploadTitle.trim()||uploadTracks.some(t=>!t.title.trim())){$("ps-upload-status").textContent="Bitte Veröffentlichungstitel und alle Songtitel ausfüllen.";return}uploadStep=2;renderUpload();return}
+ const forward=$("ps-upload-forward");forward.disabled=true;
+ try{
+  let cover=null;if(uploadCover){if(uploadCover.size>3*1024*1024)throw Error("Für den lokalen Test Cover bitte unter 3 MB verwenden.");cover=await new Promise((ok,fail)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>fail(r.error);r.readAsDataURL(uploadCover)})}
+  const batch=crypto.randomUUID();let i=0;
+  for(const t of uploadTracks){
+   $("ps-upload-status").textContent="Veröffentlichen: "+(++i)+"/"+uploadTracks.length+" – "+t.title;
+   const buffer=await t.file.arrayBuffer();
+   await store({psx:"PSX-CD",version:1,id:crypto.randomUUID(),releaseId:batch,title:t.title.trim(),releaseTitle:uploadTitle.trim(),artist:"PS AI MUSIC",releaseType:uploadTracks.length===1?"single":(uploadType||(uploadTracks.length>=7?"album":"ep")),position:i,cover,mime:"audio/mpeg",encoding:"base64",sha256:await sha(buffer),data:encode(buffer),created:new Date().toISOString()});
+  }
+  await render();$("ps-upload-overlay").classList.add("hidden");show("ps-unified-music");
+ }catch(e){$("ps-upload-status").textContent="Fehler: "+e.message}
+ finally{forward.disabled=false}
+};
 async function importPsxFile(file){
  if(!file)return;
  try {
@@ -362,10 +445,7 @@ async function importPsxFile(file){
   play(t);
  }catch(e){alert("PSX-CD konnte nicht geladen werden: "+e.message)}
 }
-$("psx-load-disc").onclick=()=>$("psx-global-file").click();
-$("psx-library-import").onclick=()=>$("psx-global-file").click();
-$("psx-global-file").onchange=async e=>{const f=e.target.files[0];await importPsxFile(f);e.target.value=""};
-const routes={"open-home":"homeview","ps-open-search":"homeview","open-playlists":"playlistview","ps-open-overview":"ps-unified-overview","ps-open-mymusic":"ps-unified-overview","ps-sub-releases":"ps-unified-music","ps-dashboard-all":"ps-unified-music"};
+const routes={"ps-sub-profile":"ps-unified-profile","ps-menu-artist":"ps-unified-profile","open-home":"homeview","ps-open-search":"homeview","open-playlists":"playlistview","ps-open-overview":"ps-unified-overview","ps-open-mymusic":"ps-unified-overview","ps-sub-releases":"ps-unified-music","ps-dashboard-all":"ps-unified-music"};
 document.querySelectorAll("button, [data-psl-click]").forEach(el=>el.addEventListener("click",ev=>{const id=el.dataset.pslClick||el.id;if(["ps-upload-open","ps-dashboard-upload"].includes(id))openUpload();else if(routes[id])show(routes[id]);else if(id==="psl-random"&&songs.length)play(songs[Math.floor(Math.random()*songs.length)]);else if(id==="ps-open-search")$("q").focus()}));
 $("ps-upload-close").onclick=()=>$("ps-upload-overlay").classList.add("hidden");
 for(const id of ["ps-play","ps-mini-play"])$(id).onclick=toggle;
@@ -380,9 +460,15 @@ $("close").onclick=()=>{audio.pause();$("player").hidden=true;document.body.clas
 audio.addEventListener("timeupdate",sync);audio.addEventListener("play",sync);audio.addEventListener("pause",sync);audio.addEventListener("loadedmetadata",sync);audio.addEventListener("ended",()=>{if(!audio.loop)skip(1)});
 $("q").oninput=e=>document.querySelectorAll("#songs .psx-item").forEach(x=>x.hidden=!x.textContent.toLowerCase().includes(e.target.value.toLowerCase()));
 $("pl-list").textContent="Playlists sind im PSX-Test noch nicht angebunden.";
-$("ps-dashboard-greeting").textContent="PSX-CD Testumgebung";
-$("ps-my-music-status").textContent="Getrennte Testbibliothek – keine Produktionsdaten.";
+$("ps-dashboard-greeting").textContent="Willkommen zurück.";
+$("ps-my-music-status").textContent="Deine Songs, EPs und Alben an einem Ort.";
 $("psl-random").textContent="Zufällig reinhören";
+document.querySelectorAll("[data-my-filter]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-my-filter]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render()});
+$("ps-sub-profile").addEventListener("click",()=>show("ps-unified-profile"));
+$("ps-global-account").onclick=()=>$("ps-global-menu").classList.toggle("hidden");
+$("ps-menu-close").onclick=()=>$("ps-global-menu").classList.add("hidden");
+$("ps-menu-artist").onclick=()=>{show("ps-unified-profile");$("ps-global-menu").classList.add("hidden")};
+
 const tag=document.createElement("div");tag.className="psx-marker";tag.textContent="PSX-CD TEST";document.body.append(tag);
 (async()=>{try{db=await database();await render()}catch(e){alert("Lokale Testdatenbank nicht verfügbar: "+e.message)}show("homeview")})();
 })();

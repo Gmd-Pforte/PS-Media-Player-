@@ -399,7 +399,7 @@ function skip(dir){if(!songs.length)return;let i=songs.findIndex(t=>current&&t.i
 let uploadStep=0, uploadTracks=[], uploadTitle="", uploadType="", uploadCover=null;
 function openUpload(){
  uploadStep=0;uploadTracks=[];uploadTitle="";uploadCover=null;uploadType="";
- $("ps-upload-overlay").classList.remove("hidden");renderUpload();
+ $("ps-upload-overlay").classList.remove("hidden");document.body.classList.add("ps-unified-modal");renderUpload();
 }
 function renderUpload(){
  const box=$("ps-upload-step-content");box.replaceChildren();$("ps-upload-status").textContent="";
@@ -442,7 +442,7 @@ $("ps-upload-forward").onclick=async()=>{
    const buffer=await t.file.arrayBuffer();
    await store({psx:"PSX-CD",version:1,id:crypto.randomUUID(),releaseId:batch,title:t.title.trim(),releaseTitle:uploadTitle.trim(),artist:artistProfile().name,releaseType:uploadTracks.length===1?"single":(uploadType||(uploadTracks.length>=7?"album":"ep")),position:i,cover,mime:"audio/mpeg",encoding:"base64",sha256:await sha(buffer),data:encode(buffer),created:new Date().toISOString()});
   }
-  await render();$("ps-upload-overlay").classList.add("hidden");show("ps-unified-music");
+  await render();$("ps-upload-overlay").classList.add("hidden");document.body.classList.remove("ps-unified-modal");show("ps-unified-music");
  }catch(e){$("ps-upload-status").textContent="Fehler: "+e.message}
  finally{forward.disabled=false}
 };
@@ -467,7 +467,7 @@ async function importPsxFile(file){
 }
 const routes={"ps-sub-profile":"ps-unified-profile","ps-menu-artist":"ps-unified-profile","open-home":"homeview","ps-open-search":"homeview","open-playlists":"playlistview","ps-open-overview":"ps-unified-overview","ps-open-mymusic":"ps-unified-overview","ps-sub-releases":"ps-unified-music","ps-dashboard-all":"ps-unified-music"};
 document.querySelectorAll("button, [data-psl-click]").forEach(el=>el.addEventListener("click",ev=>{const id=el.dataset.pslClick||el.id;if(["ps-upload-open","ps-dashboard-upload"].includes(id))openUpload();else if(routes[id])show(routes[id]);else if(id==="psl-random"&&songs.length)play(songs[Math.floor(Math.random()*songs.length)]);else if(id==="ps-open-search")$("q").focus()}));
-$("ps-upload-close").onclick=()=>$("ps-upload-overlay").classList.add("hidden");
+$("ps-upload-close").onclick=()=>{$("ps-upload-overlay").classList.add("hidden");document.body.classList.remove("ps-unified-modal")};
 for(const id of ["ps-play","ps-mini-play"])$(id).onclick=toggle;
 for(const id of ["ps-prev","ps-mini-prev"])$(id).onclick=()=>skip(-1);
 for(const id of ["ps-next","ps-mini-next"])$(id).onclick=()=>skip(1);
@@ -479,7 +479,7 @@ $("expand").onclick=()=>$("ps-audio-panel").classList.toggle("hidden");
 $("close").onclick=()=>{audio.pause();$("player").hidden=true;document.body.classList.remove("psl-player-on")};
 audio.addEventListener("timeupdate",sync);audio.addEventListener("play",sync);audio.addEventListener("pause",sync);audio.addEventListener("loadedmetadata",sync);audio.addEventListener("ended",()=>{if(!audio.loop)skip(1)});
 $("q").oninput=e=>document.querySelectorAll("#songs .psx-item").forEach(x=>x.hidden=!x.textContent.toLowerCase().includes(e.target.value.toLowerCase()));
-$("pl-list").textContent="Playlists sind im PSX-Test noch nicht angebunden.";
+$("pl-list").textContent="Du hast noch keine Playlists.";
 $("ps-dashboard-greeting").textContent="Willkommen zurück.";
 $("ps-my-music-status").textContent="Deine Songs, EPs und Alben an einem Ort.";
 $("psl-random").textContent="Zufällig reinhören";
@@ -489,7 +489,7 @@ $("ps-global-account").onclick=()=>$("ps-global-menu").classList.toggle("hidden"
 $("ps-menu-close").onclick=()=>$("ps-global-menu").classList.add("hidden");
 $("ps-menu-artist").onclick=()=>{show("ps-unified-profile");$("ps-global-menu").classList.add("hidden")};
 
-const tag=document.createElement("div");tag.className="psx-marker";tag.textContent="PSX-CD TEST";document.body.append(tag);
+
 (async()=>{try{db=await database();await render()}catch(e){alert("Lokale Testdatenbank nicht verfügbar: "+e.message)}show("homeview")})();
 })();
 </script></body>

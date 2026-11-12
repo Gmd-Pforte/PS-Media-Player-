@@ -93,7 +93,7 @@
           <span class="eyebrow">PS AI MUSIC</span>
           <h1><span class="psl-w">Musik,</span> <span class="psl-w" style="animation-delay:.1s">die</span> <span class="psl-w" style="animation-delay:.2s">etwas</span> <em class="psl-w" style="animation-delay:.3s">bedeutet.</em></h1>
           <p>Entdecke Künstler, Alben und Songs. Erstelle deine Lieblingsplaylists und höre direkt hier.</p>
-          <div class="psl-hero-actions">
+          <div class="psl-hero-actions"><button type="button" class="btn" id="psx-load-disc">💿 PSX-CD laden</button><input type="file" id="psx-global-file" accept=".psx,application/json" hidden>
             <a href="#music" class="btn">Jetzt entdecken</a>
             <button type="button" class="btn secondary" id="psl-random"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Zufällig reinhören</button>
           </div>
@@ -121,7 +121,7 @@
 
       <section class="psl-block">
         <div class="ps-section-heading"><div><div class="ps-section-kicker">EINZELSTÜCKE</div><h2>Singles</h2></div></div>
-        <div id="songs" class="list"></div>
+        <div class="psl-hero-actions" style="margin:0 0 16px"><button type="button" id="psx-library-import" class="btn secondary">💿 PSX-CD laden</button></div><div id="songs" class="list"></div>
       </section>
     </section>
 
@@ -342,6 +342,26 @@ $("ps-upload-step-content").innerHTML='<div class="psx-upload-fields"><p>PSX-CD 
 $("psx-file").onchange=()=>{const f=$("psx-file").files[0];if(f)$("psx-title").value=f.name.replace(/\.mp3$/i,"")};
 $("psx-create").onclick=async()=>{const f=$("psx-file").files[0];if(!f||!/\.mp3$/i.test(f.name))return $("ps-upload-status").textContent="Bitte eine MP3 auswählen.";$("psx-create").disabled=true;$("ps-upload-status").textContent="PSX-Musikcode wird erstellt ...";try{const buffer=await f.arrayBuffer();const t={psx:"PSX-CD",version:1,id:crypto.randomUUID(),title:$("psx-title").value||f.name.replace(/\.mp3$/i,""),artist:$("psx-artist").value||"PS AI MUSIC",mime:"audio/mpeg",encoding:"base64",sha256:await sha(buffer),data:encode(buffer)};await store(t);await render();$("ps-upload-status").textContent="PSX-CD erstellt.";$("ps-upload-overlay").classList.add("hidden");show("ps-unified-music")}catch(e){$("ps-upload-status").textContent=e.message}finally{$("psx-create").disabled=false}};
 $("psx-import").onclick=()=>$("psx-import-file").click();$("psx-import-file").onchange=async()=>{try{const t=JSON.parse(await $("psx-import-file").files[0].text());if(t.psx!=="PSX-CD"||!t.data)throw Error("Nicht unterstützte Datei");if(t.sha256&&await sha(decode(t.data))!==t.sha256)throw Error("Prüfsumme falsch");t.id=crypto.randomUUID();await store(t);await render();$("ps-upload-overlay").classList.add("hidden");show("ps-unified-music")}catch(e){$("ps-upload-status").textContent=e.message}}}
+
+async function importPsxFile(file){
+ if(!file)return;
+ try {
+  const text=await file.text();
+  let t=JSON.parse(text);
+  // Supported PSX-CD v1: self-contained JSON music code.
+  if(t.psx!=="PSX-CD" || t.encoding!=="base64" || typeof t.data!=="string" || !t.data || !t.title) throw Error("Diese PSX-CD ist nicht im unterstützten PSX-CD-Codeformat.");
+  const data=decode(t.data);
+  if(t.sha256 && await sha(data)!==t.sha256) throw Error("Die PSX-Prüfsumme stimmt nicht.");
+  t={...t,id:crypto.randomUUID(),artist:t.artist||"PS AI MUSIC"};
+  await store(t);await render();
+  $("ps-upload-overlay").classList.add("hidden");
+  show("ps-unified-music");
+  play(t);
+ }catch(e){alert("PSX-CD konnte nicht geladen werden: "+e.message)}
+}
+$("psx-load-disc").onclick=()=>$("psx-global-file").click();
+$("psx-library-import").onclick=()=>$("psx-global-file").click();
+$("psx-global-file").onchange=async e=>{const f=e.target.files[0];await importPsxFile(f);e.target.value=""};
 const routes={"open-home":"homeview","ps-open-search":"homeview","open-playlists":"playlistview","ps-open-overview":"ps-unified-overview","ps-open-mymusic":"ps-unified-overview","ps-sub-releases":"ps-unified-music","ps-dashboard-all":"ps-unified-music"};
 document.querySelectorAll("button, [data-psl-click]").forEach(el=>el.addEventListener("click",ev=>{const id=el.dataset.pslClick||el.id;if(["ps-upload-open","ps-dashboard-upload"].includes(id))openUpload();else if(routes[id])show(routes[id]);else if(id==="psl-random"&&songs.length)play(songs[Math.floor(Math.random()*songs.length)]);else if(id==="ps-open-search")$("q").focus()}));
 $("ps-upload-close").onclick=()=>$("ps-upload-overlay").classList.add("hidden");
